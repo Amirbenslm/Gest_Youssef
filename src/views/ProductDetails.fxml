@@ -1,110 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<FlowPane alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="280.0" prefWidth="380.0" vgap="10.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.ProductDetailsController">
+<AnchorPane prefHeight="280.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.ProductDetailsController">
    <children>
-      <GridPane prefWidth="300.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <FlowPane alignment="CENTER_LEFT">
-               <children>
-                  <Label text="Code : " />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER_LEFT" GridPane.rowIndex="1">
-               <children>
-                  <Label text="Libellé : " />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
-               <children>
-                  <TextField fx:id="txtCode" />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <children>
-                  <TextField />
-               </children>
-            </FlowPane>
-         </children>
-      </GridPane>
-      <FlowPane alignment="BOTTOM_LEFT" prefHeight="49.0" prefWidth="300.0">
-         <children>
-            <Label text="Prix  " />
-            <Separator prefWidth="250.0" />
-         </children>
-      </FlowPane>
-      <GridPane>
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <Label text="     Prix d'achat TTC : " />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
-               <children>
-                  <TextField />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
-               <children>
-                  <Label text="     TVA : " />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <children>
-                  <TextField />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
-               <children>
-                  <Label text="     Prix de vente HT : " />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <children>
-                  <TextField />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
-               <children>
-                  <Label text="     Prix de vente TTC : " />
-               </children>
-            </FlowPane>
-            <FlowPane alignment="CENTER" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <children>
-                  <TextField />
-               </children>
-            </FlowPane>
-         </children>
-      </GridPane>
+      <Label layoutX="45.0" layoutY="45.0" text="Code : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0" />
+      <Label layoutX="41.0" layoutY="76.0" text="Libellé : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="55.0" />
+      <TextField fx:id="txtCode" layoutX="106.0" layoutY="40.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="10.0" />
+      <TextField fx:id="txtLibelle" layoutX="106.0" layoutY="71.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="50.0" />
+      <Label layoutX="15.0" layoutY="112.0" text="Prix  " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="100.0" />
+      <Separator layoutX="47.0" layoutY="107.0" prefWidth="330.0" />
+      <Label layoutX="33.0" layoutY="125.0" text="     Prix d'achat TTC : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="125.0" />
+      <TextField fx:id="txtPrixDachatTTC" layoutX="159.0" layoutY="120.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="120.0" />
+      <Label layoutX="39.0" layoutY="154.0" text="     TVA : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="165.0" />
+      <TextField fx:id="txtTVA" layoutX="207.0" layoutY="213.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="160.0" />
+      <Label layoutX="24.0" layoutY="183.0" text="     Prix de vente HT : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="205.0" />
+      <TextField fx:id="txtPrixDeVentHT" layoutX="197.0" layoutY="258.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="200.0" />
+      <Label layoutX="24.0" layoutY="250.0" text="     Prix de vente TTC : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="245.0" />
+      <TextField fx:id="txtPrixDeVentTTC" layoutX="165.0" layoutY="240.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="240.0" />
+      <TableView layoutX="406.0" layoutY="13.0" prefHeight="258.0" prefWidth="280.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+        <columns>
+          <TableColumn maxWidth="195.0" minWidth="195.0" prefWidth="195.0" resizable="false" text="Dépôt" />
+          <TableColumn maxWidth="85.0" minWidth="85.0" prefWidth="85.0" resizable="false" text="Stock" />
+        </columns>
+      </TableView>
    </children>
-   <opaqueInsets>
-      <Insets />
-   </opaqueInsets>
-</FlowPane>
+</AnchorPane>

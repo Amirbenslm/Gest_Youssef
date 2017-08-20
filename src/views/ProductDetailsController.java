@@ -11,7 +11,14 @@ public class ProductDetailsController implements Initializable{
 
 	
 	@FXML TextField txtCode;
+	@FXML TextField txtLibelle;
 	
+	@FXML TextField txtPrixDachatTTC;
+	@FXML TextField txtTVA;
+	@FXML TextField txtPrixDeVentHT;
+	@FXML TextField txtPrixDeVentTTC;
+	
+
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {

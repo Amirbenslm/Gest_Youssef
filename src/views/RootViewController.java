@@ -11,8 +11,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import models.ViewController;
 
@@ -37,7 +39,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	@FXML Button btnAddInventaire;
 
 
-	@FXML BorderPane containerBP;
+	@FXML FlowPane containerFP;
 
 
 	@Override
@@ -103,7 +105,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 		else if (event.getSource() == btnAddDepot) {
-			System.out.println("hhh");
+			showAddNewDepotView();
 		}
 
 		else if (event.getSource() == btnDepot) {
@@ -125,9 +127,29 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/ProductDetails.fxml"));
+			loader.setLocation(getClass().getResource("/views/AddNewProduct.fxml"));
 			Pane p = loader.load();
-			containerBP.setCenter(p);
+			//containerBP.setCenter(p);
+			containerFP.getChildren().clear();
+			containerFP.getChildren().add(p);
+			System.gc();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void showAddNewDepotView() {
+		
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditDepotDetails.fxml"));
+			Pane p = loader.load();
+			//containerBP.setCenter(p);
+			containerFP.getChildren().clear();
+			containerFP.getChildren().add(p);
+			System.gc();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
