@@ -26,8 +26,10 @@ public class MainApp extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("/views/RootView.fxml"));
-			Scene scence = new Scene(loader.load());
+			Scene scence = new Scene(loader.load(),1000,700);
 			primaryStage.setScene(scence);
+			primaryStage.setMinWidth(700);
+			primaryStage.setMinHeight(400);
 			primaryStage.show();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

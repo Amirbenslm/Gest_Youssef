@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="723.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.StockTransferController">
+   <children>
+      <FlowPane alignment="CENTER" layoutX="39.0" layoutY="189.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane prefHeight="653.0" prefWidth="791.0">
+               <children>
+                  <DatePicker fx:id="date" layoutX="557.0" layoutY="53.0" prefHeight="25.0" prefWidth="180.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+                  <Label layoutX="369.0" layoutY="216.0" text="Vers : " AnchorPane.rightAnchor="330.0" AnchorPane.topAnchor="65.0" />
+                  <ComboBox layoutX="464.0" layoutY="211.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0" />
+                  <Label layoutX="552.0" layoutY="20.0" text="Date : " AnchorPane.rightAnchor="199.0" AnchorPane.topAnchor="20.0" />
+                  <ComboBox layoutX="78.0" layoutY="200.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="60.0" />
+                  <Label layoutX="15.0" layoutY="205.0" text="Depuis : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="65.0" />
+                  <TableView layoutX="42.0" layoutY="151.0" prefHeight="218.0" prefWidth="248.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="120.0">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="C1" />
+                      <TableColumn prefWidth="75.0" text="C2" />
+                    </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+         </children>
+      </FlowPane>
+      <FlowPane alignment="CENTER" hgap="20.0" layoutX="39.0" layoutY="324.0" prefHeight="60.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Button fx:id="btnCancel" mnemonicParsing="false" text="Annuler" />
+            <Button fx:id="btnTransfere" mnemonicParsing="false" text="Transférer" />
+         </children>
+      </FlowPane>
+   </children>
+</AnchorPane>

@@ -193,6 +193,6 @@
         </tabs>
       </TabPane>
       <Separator layoutX="16.0" layoutY="174.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="160.0" />
-      <FlowPane fx:id="containerFP" prefHeight="434.0" prefWidth="986.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="165.0" />
+      <AnchorPane fx:id="containerAP" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="165.0" />
    </children>
 </AnchorPane>

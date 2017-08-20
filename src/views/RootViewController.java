@@ -10,12 +10,16 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import models.ViewController;
 
 public class RootViewController implements Initializable, EventHandler<ActionEvent>{
@@ -39,7 +43,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	@FXML Button btnAddInventaire;
 
 
-	@FXML FlowPane containerFP;
+	@FXML AnchorPane containerAP;
 
 
 	@Override
@@ -63,6 +67,30 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	}
 
 
+	private void showPaneInContainer(Pane p) {
+		
+		AnchorPane.setTopAnchor(p, 0.0);
+		AnchorPane.setBottomAnchor(p, 0.0);
+		AnchorPane.setLeftAnchor(p, 0.0);
+		AnchorPane.setRightAnchor(p, 0.0);
+		
+		containerAP.getChildren().clear();
+		containerAP.getChildren().add(p);
+		System.gc();
+		
+	}
+	
+	private void showPaneInAlertMode(String title,Pane p,double width,double height) {
+		
+		Scene scene = new Scene(p, width, height);
+		Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+        stage.setTitle(title);
+
+        stage.setScene(scene);
+        stage.show();
+	}
 
 
 	@Override
@@ -97,11 +125,11 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 		else if (event.getSource() == btnEntryStock) {
-			System.out.println("hhh");
+			showStockInputView();
 		}
 
 		else if (event.getSource() == btnTransferStock) {
-			System.out.println("hhh");
+			showStockTransferView();
 		}
 
 		else if (event.getSource() == btnAddDepot) {
@@ -118,7 +146,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 		else if (event.getSource() == btnAddInventaire) {
 			System.out.println("mmm");
-			
+
 		}
 
 	}
@@ -129,32 +157,62 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("/views/AddNewProduct.fxml"));
 			Pane p = loader.load();
-			//containerBP.setCenter(p);
-			containerFP.getChildren().clear();
-			containerFP.getChildren().add(p);
-			System.gc();
+			
+			showPaneInAlertMode("BLA", p, 850, 400);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private void showAddNewDepotView() {
-		
+
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("/views/AddEditDepotDetails.fxml"));
 			Pane p = loader.load();
-			//containerBP.setCenter(p);
-			containerFP.getChildren().clear();
-			containerFP.getChildren().add(p);
-			System.gc();
+
+			showPaneInAlertMode("BLABLA", p, 500, 300);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
+	
+	private void showStockInputView() {
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/StockInput.fxml"));
+			Pane p = loader.load();
+
+			showPaneInAlertMode("BLABLA", p, 850, 400);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+	private void showStockTransferView() {
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/StockTransfer.fxml"));
+			Pane p = loader.load();
+
+			showPaneInAlertMode("BLABLA", p, 830, 730);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+
 
 }
