@@ -23,10 +23,10 @@
       <TextField fx:id="txtPrixDeVentHT" layoutX="197.0" layoutY="258.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="200.0" />
       <Label layoutX="24.0" layoutY="250.0" text="     Prix de vente TTC : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="245.0" />
       <TextField fx:id="txtPrixDeVentTTC" layoutX="165.0" layoutY="240.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="240.0" />
-      <TableView layoutX="406.0" layoutY="13.0" prefHeight="258.0" prefWidth="280.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+      <TableView fx:id="tableViewDepots" editable="true" layoutX="406.0" layoutY="13.0" prefHeight="258.0" prefWidth="280.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
         <columns>
-          <TableColumn maxWidth="195.0" minWidth="195.0" prefWidth="195.0" resizable="false" text="Dépôt" />
-          <TableColumn maxWidth="85.0" minWidth="85.0" prefWidth="85.0" resizable="false" text="Stock" />
+          <TableColumn fx:id="columnDepotName" editable="false" maxWidth="195.0" minWidth="195.0" prefWidth="195.0" resizable="false" text="Dépôt" />
+          <TableColumn fx:id="columnStock" maxWidth="85.0" minWidth="85.0" prefWidth="85.0" resizable="false" text="Stock" />
         </columns>
       </TableView>
    </children>

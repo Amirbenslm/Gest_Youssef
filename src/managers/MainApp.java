@@ -2,6 +2,7 @@ package managers;
 
 import java.io.IOException;
 
+import exceptions.DataBaseDriverLoadFailedException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -39,6 +40,14 @@ public class MainApp extends Application {
 
 
 	public static void main(String[] args) {
-		launch(args);
+		try {
+			AppDataBaseManager.shared.prepare();
+			
+			launch(args);
+		} catch (DataBaseDriverLoadFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }
