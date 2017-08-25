@@ -5,6 +5,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -18,9 +21,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import managers.AppDataBaseManager;
 import managers.StringsManager;
-import models.AlertError;
 import models.Depot;
-import models.Stock;
+import models.ProductStockTableViewModel;
+import models.ui.AlertError;
+import models.ui.StringConverterInteger;
 
 public class ProductDetailsController implements Initializable{
 
@@ -33,29 +37,38 @@ public class ProductDetailsController implements Initializable{
 	@FXML TextField txtPrixDeVentHT;
 	@FXML TextField txtPrixDeVentTTC;
 
-	@FXML TableView<Stock> tableViewDepots;
-	@FXML TableColumn<Stock, String> columnDepotName;
-	@FXML TableColumn<Stock, String> columnStock;
+	@FXML TableView<ProductStockTableViewModel> tableViewDepots;
+	@FXML TableColumn<ProductStockTableViewModel, String> columnDepotName;
+	@FXML TableColumn<ProductStockTableViewModel, Integer> columnStock;
 
 
-	private ObservableList<Stock> depotsData = FXCollections.observableArrayList();
-
+	private StringsManager stringsManager = new StringsManager();
 	
 	
+	private ObservableList<ProductStockTableViewModel> depotsData = FXCollections.observableArrayList();
+
+
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
 		columnDepotName.setCellValueFactory(new PropertyValueFactory<>("DepotName"));
-		columnStock.setCellValueFactory(new PropertyValueFactory<>("QntAsString"));
+		columnStock.setCellValueFactory(new PropertyValueFactory<>("Qnt"));
 
-		columnStock.setCellFactory(TextFieldTableCell.forTableColumn());
-		
-		TableColumnChangeEventHandler tableColumnChangeEventHandler = new TableColumnChangeEventHandler();
-		columnStock.setOnEditCommit(tableColumnChangeEventHandler);
-		
-		
+		columnStock.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterInteger()));
+		columnStock.setOnEditCommit(new TableColumnChangeEventHandler());
+
 		tableViewDepots.setItems(depotsData);
 		
+		TextFieldChangeListener textFieldChangeListener = new TextFieldChangeListener();
+		
+		txtCode.textProperty().addListener(textFieldChangeListener);
+		txtLibelle.textProperty().addListener(textFieldChangeListener);
+		txtPrixDachatTTC.textProperty().addListener(textFieldChangeListener);
+		txtTVA.textProperty().addListener(textFieldChangeListener);
+		txtPrixDeVentHT.textProperty().addListener(textFieldChangeListener);
+		txtPrixDeVentTTC.textProperty().addListener(textFieldChangeListener);
+
 		try {
 			loadDepotsData();
 		} catch (SQLException e) {
@@ -66,39 +79,63 @@ public class ProductDetailsController implements Initializable{
 
 	}
 
+	public ArrayList<ProductStockTableViewModel> getDepotsStocks(){
+		ArrayList<ProductStockTableViewModel> depotsStocks = new ArrayList<>();
+		
+		for (int i=0; i< depotsData.size(); i++) {
+			depotsStocks.add(depotsData.get(i));
+		}
+		
+		return depotsStocks;
+	}
 
 	private void loadDepotsData() throws SQLException{
 		ArrayList<Depot> depotsList = AppDataBaseManager.shared.getAllDepots();
 		for (int i=0;i<depotsList.size();i++){
-			depotsData.add(new Stock(depotsList.get(i), null, 0));
+			depotsData.add(new ProductStockTableViewModel(depotsList.get(i), null, 0));
 		}
+	}
+
+
+	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<ProductStockTableViewModel, Integer>> {
+
+		@Override
+		public void handle(CellEditEvent<ProductStockTableViewModel, Integer> event) {
+			depotsData.get(event.getTablePosition().getRow()).setQnt(event.getNewValue());
+		}
+
 	}
 	
 	
-	
-	
-	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<Stock, String>> {
+	private class TextFieldChangeListener implements ChangeListener<String> {
 
 		@Override
-		public void handle(CellEditEvent<Stock, String> event) {
-			StringsManager stringsManager = new StringsManager();
+		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+
+			TextField txt = (TextField) ((StringProperty)observable).getBean();
 			
-			String newValue = stringsManager.getOnlyNumbers(event.getNewValue());
-			
-			if (newValue.equals("")) {
-				newValue = stringsManager.getOnlyNumbers(event.getOldValue());
+			if (txt == txtCode) {
+				String ch = txt.getText().replaceAll(" ", "");
+				ch = stringsManager.getOnlyLettersAndNumbers(ch);
+				txt.setText(ch.toUpperCase());
 			}
-			
-			if (newValue.equals("")) {
-				newValue = "0";
+			else if (txt == txtLibelle) {
+				txt.setText(stringsManager.removeUnwantedSpaces(txt.getText()));
 			}
-			
-			int newQNT = Integer.parseInt(newValue);
-			depotsData.get(event.getTablePosition().getRow()).setQnt(newQNT);;
-			
-			tableViewDepots.refresh();
+			else if (txt == txtPrixDachatTTC) {
+				txt.setText(stringsManager.getDoubleFormat(txt.getText()));
+			}
+			else if (txt == txtTVA) {
+				txt.setText(stringsManager.getDoubleFormat(txt.getText()));
+			}
+			else if (txt == txtPrixDeVentHT) {
+				txt.setText(stringsManager.getDoubleFormat(txt.getText()));
+			}
+			else if (txt == txtPrixDeVentTTC) {
+				txt.setText(stringsManager.getDoubleFormat(txt.getText()));
+			}
+
 		}
-		
 		
 	}
 

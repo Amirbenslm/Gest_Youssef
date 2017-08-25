@@ -7,7 +7,6 @@ public class Depot {
 	private String comments;
 	
 	public Depot(int code, String name, String comments) {
-		super();
 		this.code = code;
 		this.name = name;
 		this.comments = comments;

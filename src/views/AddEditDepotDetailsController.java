@@ -12,15 +12,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import managers.AppDataBaseManager;
-import models.AlertError;
-import models.AlertWarning;
+import models.ui.AlertError;
+import models.ui.AlertWarning;
 
 public class AddEditDepotDetailsController implements Initializable {
 
@@ -37,12 +35,11 @@ public class AddEditDepotDetailsController implements Initializable {
 		// TODO Auto-generated method stub
 
 		loadDepoDetailsView();
+		updateBtnSaveView();
 
 		ButtonActionEventHandler buttonActionEventHandler = new ButtonActionEventHandler();
 		btnSave.setOnAction(buttonActionEventHandler);
 		btnCancel.setOnAction(buttonActionEventHandler);
-		
-		updateBtnSaveView();
 		
 		depotDetailsController.txtName.textProperty().addListener(new TextFieldChangeListener());
 	}

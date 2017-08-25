@@ -1,17 +1,28 @@
 package models;
 
-public class Stock {
+public class ProductStockTableViewModel {
 
 	private Depot depot;
 	private Product product;
 	private int qnt;
 	
-	public Stock(Depot depot, Product product, int qnt) {
+	public ProductStockTableViewModel(Depot depot, Product product, int qnt) {
 		this.depot = depot;
 		this.product = product;
 		this.qnt = qnt;
 	}
 	
+	
+	public Depot getDepot() {
+		return depot;
+	}
+
+
+	public Product getProduct() {
+		return product;
+	}
+
+
 	public String getDepotName(){
 		return depot.getName();
 	}
@@ -27,10 +38,5 @@ public class Stock {
 	public void setQnt(int qnt) {
 		this.qnt = qnt;
 	}
-	
-	public String getQntAsString() {
-		return Integer.toString(qnt);
-	}
-	
 	
 }

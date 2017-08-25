@@ -117,7 +117,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 		else if (event.getSource() == btnArticles) {
-			System.out.println("hhh");
+			showAllProductView();
 		}
 
 		else if (event.getSource() == btnAddArticle) {
@@ -151,6 +151,21 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	}
 
+	
+	private void showAllProductView(){
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AllProducts.fxml"));
+			Pane p = loader.load();
+			showPaneInContainer(p);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
 	private void showAddNewProductView(){
 
 		try {
