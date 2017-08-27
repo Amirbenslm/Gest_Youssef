@@ -22,7 +22,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import managers.AppDataBaseManager;
 import managers.StringsManager;
 import models.Depot;
-import models.ProductStockTableViewModel;
+import models.DepotStock;
 import models.ui.AlertError;
 import models.ui.StringConverterInteger;
 
@@ -37,22 +37,22 @@ public class ProductDetailsController implements Initializable{
 	@FXML TextField txtPrixDeVentHT;
 	@FXML TextField txtPrixDeVentTTC;
 
-	@FXML TableView<ProductStockTableViewModel> tableViewDepots;
-	@FXML TableColumn<ProductStockTableViewModel, String> columnDepotName;
-	@FXML TableColumn<ProductStockTableViewModel, Integer> columnStock;
+	@FXML TableView<DepotStock> tableViewDepots;
+	@FXML TableColumn<DepotStock, String> columnDepotName;
+	@FXML TableColumn<DepotStock, Integer> columnStock;
 
 
 	private StringsManager stringsManager = new StringsManager();
 	
 	
-	private ObservableList<ProductStockTableViewModel> depotsData = FXCollections.observableArrayList();
+	private ObservableList<DepotStock> depotsData = FXCollections.observableArrayList();
 
 
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		columnDepotName.setCellValueFactory(new PropertyValueFactory<>("DepotName"));
+		columnDepotName.setCellValueFactory(new PropertyValueFactory<>("Name"));
 		columnStock.setCellValueFactory(new PropertyValueFactory<>("Qnt"));
 
 		columnStock.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterInteger()));
@@ -79,8 +79,8 @@ public class ProductDetailsController implements Initializable{
 
 	}
 
-	public ArrayList<ProductStockTableViewModel> getDepotsStocks(){
-		ArrayList<ProductStockTableViewModel> depotsStocks = new ArrayList<>();
+	public ArrayList<DepotStock> getDepotsStocks(){
+		ArrayList<DepotStock> depotsStocks = new ArrayList<>();
 		
 		for (int i=0; i< depotsData.size(); i++) {
 			depotsStocks.add(depotsData.get(i));
@@ -92,15 +92,15 @@ public class ProductDetailsController implements Initializable{
 	private void loadDepotsData() throws SQLException{
 		ArrayList<Depot> depotsList = AppDataBaseManager.shared.getAllDepots();
 		for (int i=0;i<depotsList.size();i++){
-			depotsData.add(new ProductStockTableViewModel(depotsList.get(i), null, 0));
+			depotsData.add(new DepotStock(depotsList.get(i), 0));
 		}
 	}
 
 
-	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<ProductStockTableViewModel, Integer>> {
+	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<DepotStock, Integer>> {
 
 		@Override
-		public void handle(CellEditEvent<ProductStockTableViewModel, Integer> event) {
+		public void handle(CellEditEvent<DepotStock, Integer> event) {
 			depotsData.get(event.getTablePosition().getRow()).setQnt(event.getNewValue());
 		}
 

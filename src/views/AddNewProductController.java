@@ -20,8 +20,9 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import managers.AppDataBaseManager;
+import models.DepotStock;
 import models.ProductPrice;
-import models.ProductStockTableViewModel;
+import models.ProductStock;
 import models.ui.AlertError;
 import models.ui.AlertWarning;
 
@@ -89,24 +90,21 @@ public class AddNewProductController implements Initializable {
 				try {
 					if (AppDataBaseManager.shared.isProductCodeExist(productCode)) {
 						AlertWarning alert = new AlertWarning("Nom existe déjà", 
-								"Le nom du dépôt ' "+productCode+" ' existe déjà !", 
+								"Le nom de l'article Blabla' "+productCode+" ' existe déjà !", 
 								"Réessayer avec un autre nom");
 						alert.showAndWait();
 					}else{
 						
 						ProductPrice price = new ProductPrice(productPrixDachatTTC, productTVA, productPrixDeVentHT, productPrixDeVentTTC);
 						
-						
 						AppDataBaseManager.shared.addNewProduct(productCode, productTitle, price);
 						
+						ArrayList<DepotStock> depotsStocks = productDetailsController.getDepotsStocks();
 						
-						ArrayList<ProductStockTableViewModel> depotsStocks = productDetailsController.getDepotsStocks();
-						
-						for (int i =0; i<depotsStocks.size();i++){
+						for (int i=0; i<depotsStocks.size();i++){
 							int qnt = depotsStocks.get(i).getQnt();
 							if (qnt != 0){
-								AppDataBaseManager.shared.transferStock(0, 
-										depotsStocks.get(i).getDepot().getCode(),productCode, qnt);
+								AppDataBaseManager.shared.transferStock(0, depotsStocks.get(i).getCode(),productCode, qnt);
 							}
 						}
 
