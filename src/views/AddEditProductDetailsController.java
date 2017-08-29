@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -15,18 +14,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import managers.AppDataBaseManager;
 import models.DepotStock;
+import models.Product;
 import models.ProductPrice;
 import models.ProductStock;
 import models.ui.AlertError;
 import models.ui.AlertWarning;
 
-public class AddNewProductController implements Initializable {
+public class AddEditProductDetailsController implements Initializable {
 
 
 	@FXML Button btnSave;
@@ -36,9 +35,10 @@ public class AddNewProductController implements Initializable {
 	Pane paneProductDetails;
 	ProductDetailsController productDetailsController;
 
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-
+		
 		loadProductDetailsView();
 
 		ButtonActionEventHandler buttonActionEventHandler = new ButtonActionEventHandler();
@@ -68,6 +68,11 @@ public class AddNewProductController implements Initializable {
 			closeStage();
 		}
 	}
+	
+	public void loadProductDetails(Product product){
+		productDetailsController.changeEditsStats(false);
+		productDetailsController.loadProductDetails(product);
+	}
 
 	private void closeStage(){
 		((Stage) containerFP.getScene().getWindow()).close();
@@ -96,15 +101,21 @@ public class AddNewProductController implements Initializable {
 					}else{
 						
 						ProductPrice price = new ProductPrice(productPrixDachatTTC, productTVA, productPrixDeVentHT, productPrixDeVentTTC);
+						Product product = new Product(productCode, productTitle, price);
 						
-						AppDataBaseManager.shared.addNewProduct(productCode, productTitle, price);
+						AppDataBaseManager.shared.addNewProduct(product);
 						
-						ArrayList<DepotStock> depotsStocks = productDetailsController.getDepotsStocks();
+						ArrayList<DepotStock> depotsStocks = productDetailsController.getDepotsStocksEntredByUser();
 						
 						for (int i=0; i<depotsStocks.size();i++){
 							int qnt = depotsStocks.get(i).getQnt();
 							if (qnt != 0){
-								AppDataBaseManager.shared.transferStock(0, depotsStocks.get(i).getCode(),productCode, qnt);
+								
+								ProductStock productStock = new ProductStock(product, qnt);
+								ArrayList<ProductStock> productStockInArrayList = new ArrayList<>();
+								productStockInArrayList.add(productStock);
+								AppDataBaseManager.shared.transferStock(0, depotsStocks.get(i).getCode(), productStockInArrayList);
+								
 							}
 						}
 

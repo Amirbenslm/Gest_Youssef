@@ -23,6 +23,8 @@ import managers.AppDataBaseManager;
 import managers.StringsManager;
 import models.Depot;
 import models.DepotStock;
+import models.Product;
+import models.ProductPrice;
 import models.ui.AlertError;
 import models.ui.StringConverterInteger;
 
@@ -41,10 +43,9 @@ public class ProductDetailsController implements Initializable{
 	@FXML TableColumn<DepotStock, String> columnDepotName;
 	@FXML TableColumn<DepotStock, Integer> columnStock;
 
-
 	private StringsManager stringsManager = new StringsManager();
-	
-	
+
+
 	private ObservableList<DepotStock> depotsData = FXCollections.observableArrayList();
 
 
@@ -59,9 +60,9 @@ public class ProductDetailsController implements Initializable{
 		columnStock.setOnEditCommit(new TableColumnChangeEventHandler());
 
 		tableViewDepots.setItems(depotsData);
-		
+
 		TextFieldChangeListener textFieldChangeListener = new TextFieldChangeListener();
-		
+
 		txtCode.textProperty().addListener(textFieldChangeListener);
 		txtLibelle.textProperty().addListener(textFieldChangeListener);
 		txtPrixDachatTTC.textProperty().addListener(textFieldChangeListener);
@@ -79,13 +80,59 @@ public class ProductDetailsController implements Initializable{
 
 	}
 
-	public ArrayList<DepotStock> getDepotsStocks(){
+
+	public void loadProductDetails(Product product){
+		try {
+			
+			if (product.getPrice() == null) {
+				ProductPrice productPrice = AppDataBaseManager.shared.getProductPrice(product.getCode());
+				product.setPrice(productPrice);
+			}
+
+			txtCode.setText(product.getCode());
+			txtLibelle.setText(product.getName());
+			txtPrixDachatTTC.setText(Double.toString(product.getPrice().getPrixAchatTTC()));
+			txtTVA.setText(Double.toString(product.getPrice().getTva()));
+			txtPrixDeVentHT.setText(Double.toString(product.getPrice().getPrixVenteHT()));
+			txtPrixDeVentTTC.setText(Double.toString(product.getPrice().getPrixVenteTTC()));
+
+
+			for (int i=0; i<depotsData.size(); i++) {
+
+
+				int qnt = AppDataBaseManager.shared.getProductsStock(product.getCode(), 
+						depotsData.get(i).getCode());
+				depotsData.get(i).setQnt(qnt);
+
+
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void changeEditsStats(boolean enabled){
+
+		txtCode.setDisable(!enabled);
+		txtLibelle.setDisable(!enabled);
+		txtPrixDachatTTC.setDisable(!enabled);
+		txtTVA.setDisable(!enabled);
+		txtPrixDeVentHT.setDisable(!enabled);
+		txtPrixDeVentTTC.setDisable(!enabled);
+		tableViewDepots.setDisable(!enabled);
+	}
+
+
+
+	public ArrayList<DepotStock> getDepotsStocksEntredByUser(){
 		ArrayList<DepotStock> depotsStocks = new ArrayList<>();
-		
+
 		for (int i=0; i< depotsData.size(); i++) {
 			depotsStocks.add(depotsData.get(i));
 		}
-		
+
 		return depotsStocks;
 	}
 
@@ -105,15 +152,15 @@ public class ProductDetailsController implements Initializable{
 		}
 
 	}
-	
-	
+
+
 	private class TextFieldChangeListener implements ChangeListener<String> {
 
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 
 			TextField txt = (TextField) ((StringProperty)observable).getBean();
-			
+
 			if (txt == txtCode) {
 				String ch = txt.getText().replaceAll(" ", "");
 				ch = stringsManager.getOnlyLettersAndNumbers(ch);
@@ -136,7 +183,7 @@ public class ProductDetailsController implements Initializable{
 			}
 
 		}
-		
+
 	}
 
 }

@@ -13,6 +13,7 @@ import exceptions.DataBaseDriverLoadFailedException;
 import models.Depot;
 import models.Product;
 import models.ProductPrice;
+import models.ProductStock;
 
 public class AppDataBaseManager {
 
@@ -99,18 +100,28 @@ public class AppDataBaseManager {
 
 
 				st.executeUpdate("CREATE TABLE TransferStock ( "
-						+ "code_depot INTEGER NOT NULL, "
-						+ "code_product VARCHAR_IGNORECASE(20) NOT NULL, "
+						+ "code INTEGER NOT NULL IDENTITY, "
 						+ "date DATETIME NOT NULL, "
-						+ "QNT INTEGER NOT NULL, "
+						+ "toDepot INTEGER NOT NULL, "
 						+ "fromDepot INTEGER NOT NULL, "
-						+ "PRIMARY KEY (code_depot, date, code_product),"
-						+ " CONSTRAINT fkTransferStockProduct FOREIGN KEY (code_product) "
-						+ "REFERENCES Product (code) ON DELETE CASCADE ON UPDATE CASCADE, "
-						+ "CONSTRAINT fkTransferStockDepot FOREIGN KEY (code_depot) "
+						+ "PRIMARY KEY (code), "
+						+ "CONSTRAINT fkTransferStockToDepot FOREIGN KEY (toDepot) "
+						+ "REFERENCES DEPOT (CODE) ON DELETE CASCADE ON UPDATE CASCADE, "
+						+ "CONSTRAINT fkTransferStockFromDepot FOREIGN KEY (fromDepot) "
 						+ "REFERENCES DEPOT (CODE) ON DELETE CASCADE ON UPDATE CASCADE);");
 
+				
+				st.executeUpdate("CREATE TABLE TransferStockProducts ( "
+						+ "code_TransferStock INTEGER NOT NULL, "
+						+ "code_product VARCHAR_IGNORECASE(20) NOT NULL, "
+						+ "QNT INTEGER NOT NULL, "
+						+ "PRIMARY KEY (code_TransferStock, code_product), "
+						+ "CONSTRAINT fkTransferStockProduct FOREIGN KEY (code_product) "
+						+ "REFERENCES Product (code) ON DELETE CASCADE ON UPDATE CASCADE, "
+						+ "CONSTRAINT fkTransferStockCode FOREIGN KEY (code_TransferStock) "
+						+ "REFERENCES TransferStock (CODE) ON DELETE CASCADE ON UPDATE CASCADE);");
 
+				
 				st.executeUpdate("INSERT INTO Depot (NAME) VALUES ('ADMIN');");
 			}
 		} catch (SQLException e1) {
@@ -154,7 +165,7 @@ public class AppDataBaseManager {
 		if (stockMax != null) {
 			pst.setInt(5, stockMax);
 		}else{
-			pst.setInt(5, 0); // Will not execute, only to avoid SQLException -> Checked with  (stockMax != null = true)
+			pst.setInt(5, 0); // Will not execute, only to avoid SQLException -> Checked with  (stockMax != null = true in the SQL)
 		}
 
 		ResultSet rs = pst.executeQuery();
@@ -165,6 +176,10 @@ public class AppDataBaseManager {
 		}
 
 		return allProductsCodes;
+	}
+	
+	public ArrayList<String> getAllProductsCodes(String codeLike, String nameLike) throws SQLException{
+		return getAllProductsCodes(codeLike, nameLike, null);
 	}
 
 
@@ -179,16 +194,16 @@ public class AppDataBaseManager {
 		pst.setString(1, name);
 		return pst.executeQuery().next();
 	}
-
-	public void addNewProduct(String code, String name, ProductPrice price) throws SQLException{
+	
+	public void addNewProduct(Product product) throws SQLException{
 		PreparedStatement pst = con.prepareStatement("INSERT INTO PRODUCT (CODE, NAME) VALUES (?, ?);");
-		pst.setString(1, code);
-		pst.setString(2, name);
+		pst.setString(1, product.getCode());
+		pst.setString(2, product.getName());
 
 		pst.executeUpdate();
 
-		addPriceForProduct(code, price);
-		initStockforProduct(code);
+		addPriceForProduct(product.getCode(), product.getPrice());
+		initStockforProduct(product.getCode());
 	}
 
 
@@ -342,46 +357,67 @@ public class AppDataBaseManager {
 		}
 
 	}
-
-	public void transferStock(int fromDepotCode, int toDdepotCode, String productCode, int qnt) throws SQLException{
-
-		PreparedStatement pst1 = null;
-
-		if (fromDepotCode != 0) {
-			pst1 = con.prepareStatement("UPDATE STOCK SET QNT = QNT - ? "
-					+ "WHERE CODE_DEPOT = ? and CODE_PRODUCT = ?;");
-
-			pst1.setInt(1, qnt);
-			pst1.setInt(2, fromDepotCode);
-			pst1.setString(3, productCode);
+	
+	
+	
+	public void transferStock(int fromDepotCode, int toDepotCode, ArrayList<ProductStock> productsWithStocks, Timestamp timestamp) throws SQLException{
+		
+		if (productsWithStocks.size() == 0) {
+			return;
 		}
 		
-		PreparedStatement pst2 = con.prepareStatement("UPDATE STOCK SET QNT = QNT + ? "
+		PreparedStatement pstInsertIntoTransfertStock = con.prepareStatement("INSERT INTO TRANSFERSTOCK "
+				+ "(DATE, TODEPOT, FROMDEPOT) VALUES (?, ?, ?);");
+		
+		PreparedStatement pstInsertIntoTransferStockProducts = con.prepareStatement("INSERT INTO "
+				+ "TRANSFERSTOCKPRODUCTS (CODE_TRANSFERSTOCK, CODE_PRODUCT, QNT) VALUES (?, ?, ?);");
+		
+		PreparedStatement pstUpdateStock = con.prepareStatement("UPDATE STOCK SET QNT = QNT + ? "
 				+ "WHERE CODE_DEPOT = ? and CODE_PRODUCT = ?;");
+		
+		
+		pstInsertIntoTransfertStock.setTimestamp(1, timestamp);
+		pstInsertIntoTransfertStock.setInt(2, toDepotCode);
+		pstInsertIntoTransfertStock.setInt(3, fromDepotCode);
+		
+		pstInsertIntoTransfertStock.executeUpdate();
+		
+		ResultSet rs = st.executeQuery("SELECT MAX(CODE) FROM TRANSFERSTOCK;");
+		rs.next();
+		int transferStockCode = rs.getInt(1);
+		
 
-		pst2.setInt(1, qnt);
-		pst2.setInt(2, toDdepotCode);
-		pst2.setString(3, productCode);
-
-
-
-		PreparedStatement pst3 = con.prepareStatement("INSERT INTO TransferStock (CODE_DEPOT, CODE_PRODUCT, "
-				+ "DATE, QNT, FROMDEPOT) VALUES (?, ?, ?, ?, ?);");
-
-		pst3.setInt(1, toDdepotCode);
-		pst3.setString(2, productCode);
-		pst3.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-		pst3.setInt(4, qnt);
-		pst3.setInt(5, fromDepotCode);
-
-
-
-		if (pst1 != null) {
-			pst1.executeUpdate();
+		pstInsertIntoTransferStockProducts.setInt(1, transferStockCode);
+		
+		
+		for (int i=0; i<productsWithStocks.size(); i++) {
+			
+			pstInsertIntoTransferStockProducts.setString(2, productsWithStocks.get(i).getCode());
+			pstInsertIntoTransferStockProducts.setInt(3, productsWithStocks.get(i).getQnt());
+			
+			pstInsertIntoTransferStockProducts.executeUpdate();
+			
+			pstUpdateStock.setInt(1, productsWithStocks.get(i).getQnt());
+			pstUpdateStock.setInt(2, toDepotCode);
+			pstUpdateStock.setString(3, productsWithStocks.get(i).getCode());
+			
+			pstUpdateStock.executeUpdate();
+			
+			
+			if (fromDepotCode != 0) {
+				pstUpdateStock.setInt(1, -productsWithStocks.get(i).getQnt());
+				pstUpdateStock.setInt(2, fromDepotCode);
+				pstUpdateStock.executeUpdate();
+			}
 		}
-		pst2.executeUpdate();
-		pst3.executeUpdate();
+		
 	}
+	
+	
+	public void transferStock(int fromDepotCode, int toDepotCode, ArrayList<ProductStock> productsWithStocks) throws SQLException{
+		transferStock(fromDepotCode, toDepotCode, productsWithStocks, new Timestamp(System.currentTimeMillis()));
+	}
+	
 
 	public Integer getProductsStock(String productCode) throws SQLException{
 
@@ -395,9 +431,9 @@ public class AppDataBaseManager {
 
 	}
 
-	public Integer getProductsStockInDepot(String productCode, String depotCode) throws SQLException{
+	public Integer getProductsStock(String productCode, int depotCode) throws SQLException{
 		ResultSet rs = st.executeQuery("SELECT QNT FROM STOCK WHERE CODE_PRODUCT = '"+productCode+"' "
-				+ "and CODE_DEPOT = '"+depotCode+"' ;");
+				+ "and CODE_DEPOT = "+depotCode+" ;");
 
 		if (rs.next()) {
 			return rs.getInt(1);

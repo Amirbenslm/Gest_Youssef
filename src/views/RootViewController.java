@@ -20,9 +20,15 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import models.Depot;
+import models.Product;
 import models.ViewController;
+import models.ui.ProductSearchPickedProductDelegate;
 
 public class RootViewController implements Initializable, EventHandler<ActionEvent>{
+
+	static public RootViewController selfRef;
+
 
 	private ArrayList<ViewController> viewsTab = new ArrayList<>();
 
@@ -45,6 +51,9 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	@FXML AnchorPane containerAP;
 
+	public RootViewController() {
+		RootViewController.selfRef = this;
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -67,29 +76,29 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	}
 
 
-	private void showPaneInContainer(Pane p) {
-		
+	public void showPaneInContainer(Pane p) {
+
 		AnchorPane.setTopAnchor(p, 0.0);
 		AnchorPane.setBottomAnchor(p, 0.0);
 		AnchorPane.setLeftAnchor(p, 0.0);
 		AnchorPane.setRightAnchor(p, 0.0);
-		
+
 		containerAP.getChildren().clear();
 		containerAP.getChildren().add(p);
 		System.gc();
-		
+
 	}
-	
-	private void showPaneInAlertMode(String title,Pane p,double width,double height) {
-		
+
+	public void showPaneInAlertMode(String title,Pane p,double width,double height) {
+
 		Scene scene = new Scene(p, width, height);
 		Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setResizable(false);
-        stage.setTitle(title);
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.setResizable(false);
+		stage.setTitle(title);
 
-        stage.setScene(scene);
-        stage.show();
+		stage.setScene(scene);
+		stage.show();
 	}
 
 
@@ -151,7 +160,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	}
 
-	
+
 	private void showAllProductView(){
 
 		try {
@@ -165,14 +174,14 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
-	
+
 	private void showAddNewProductView(){
 
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/AddNewProduct.fxml"));
+			loader.setLocation(getClass().getResource("/views/AddEditProductDetails.fxml"));
 			Pane p = loader.load();
-			
+
 			showPaneInAlertMode("BLA", p, 850, 400);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -195,7 +204,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
-	
+
 	private void showStockInputView() {
 
 		try {
@@ -210,8 +219,8 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
-	
-	
+
+
 	private void showStockTransferView() {
 
 		try {
@@ -226,8 +235,50 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
-	
-	
 
+
+	public void presentProductsEditsView(Product product){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditProductDetails.fxml"));
+			Pane p = loader.load();
+			AddEditProductDetailsController addEditProductDetailsController = loader.getController();
+			
+			addEditProductDetailsController.loadProductDetails(product);
+			
+			showPaneInAlertMode("BLA", p, 850, 400);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	//Enter "" empty string in search constraint to disable it
+	public void presentProductSearchView(Depot forDepot, ProductSearchPickedProductDelegate delegate, 
+			String forProductCode, String forProductName){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/ProductSearch.fxml"));
+			Pane p = loader.load();
+			ProductSearchController productSearchController = loader.getController();
+			productSearchController.delegate = delegate;
+			if (forDepot != null) {
+				productSearchController.configureDepot(forDepot);
+			}
+			if (! forProductCode.equals("") || ! forProductName.equals("")){
+				productSearchController.forceSearch(forProductCode, forProductName);
+			}
+			
+			showPaneInAlertMode("BLA", p, 850, 400);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void presentProductSearchView(ProductSearchPickedProductDelegate delegate, 
+			String forProductCode, String forProductName){
+		presentProductSearchView(null, delegate, forProductCode, forProductName);
+	}
 
 }
