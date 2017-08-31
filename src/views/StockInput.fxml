@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.FlowPane?>
@@ -15,7 +16,7 @@
             <AnchorPane prefHeight="247.0" prefWidth="791.0">
                <children>
                   <Label layoutX="29.0" layoutY="26.0" text="Code article : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="100.0" />
-                  <DatePicker fx:id="date" layoutX="557.0" layoutY="53.0" prefHeight="25.0" prefWidth="180.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+                  <DatePicker fx:id="date" layoutX="354.0" layoutY="23.0" prefHeight="25.0" prefWidth="180.0" AnchorPane.rightAnchor="257.0" AnchorPane.topAnchor="23.0" />
                   <TextField fx:id="txtCode" layoutX="112.0" layoutY="9.0" prefHeight="27.0" prefWidth="145.0" AnchorPane.leftAnchor="110.0" AnchorPane.topAnchor="95.0" />
                   <TextField fx:id="txtName" disable="true" layoutX="319.0" layoutY="10.0" prefHeight="27.0" prefWidth="380.0" AnchorPane.leftAnchor="330.0" AnchorPane.topAnchor="95.0" />
                   <TextField fx:id="txtQnt" layoutX="112.0" layoutY="145.0" prefHeight="27.0" prefWidth="80.0" AnchorPane.leftAnchor="110.0" AnchorPane.topAnchor="145.0" />
@@ -24,7 +25,9 @@
                   <Label layoutX="369.0" layoutY="216.0" text="Vers dépôt : " AnchorPane.rightAnchor="330.0" AnchorPane.topAnchor="205.0" />
                   <ComboBox layoutX="464.0" layoutY="211.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="200.0" />
                   <Label layoutX="25.0" layoutY="150.0" text="Quantité : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="150.0" />
-                  <Label layoutX="546.0" layoutY="22.0" text="Date : " AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="20.0" />
+                  <Label layoutX="309.0" layoutY="28.0" text="Date : " AnchorPane.rightAnchor="442.0" AnchorPane.topAnchor="28.0" />
+                  <Spinner fx:id="spinerHoures" editable="true" layoutX="563.0" layoutY="23.0" prefHeight="27.0" prefWidth="66.0" />
+                  <Spinner fx:id="spinerMinutes" editable="true" layoutX="664.0" layoutY="23.0" prefHeight="27.0" prefWidth="66.0" />
                </children>
             </AnchorPane>
          </children>

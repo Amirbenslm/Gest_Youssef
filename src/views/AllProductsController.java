@@ -1,11 +1,11 @@
 package views;
 
-import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -13,17 +13,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import managers.AppDataBaseManager;
 import models.Product;
@@ -91,8 +88,12 @@ public class AllProductsController implements Initializable{
 		
 		tableViewProductsStocks.setItems(productsStockData);
 		
-		
-		
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				txtCode.requestFocus();
+			}
+		});
 	}
 
 
