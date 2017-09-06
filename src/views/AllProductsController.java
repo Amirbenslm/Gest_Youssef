@@ -97,8 +97,6 @@ public class AllProductsController implements Initializable{
 	}
 
 
-
-
 	public void refrechTableViewData(){
 
 		productsStockData.clear();

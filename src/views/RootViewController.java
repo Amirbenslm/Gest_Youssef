@@ -205,10 +205,10 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/StockInput.fxml"));
+			loader.setLocation(getClass().getResource("/views/StockTransfer.fxml"));
 			Pane p = loader.load();
-
-			showPaneInAlertMode("BLABLA", p, 850, 400);
+			( (StockTransferController) loader.getController() ).forceSetTransferFromAdminMode();
+			showPaneInAlertMode("BLABLA", p, 830, 730);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

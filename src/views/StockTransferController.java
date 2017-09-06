@@ -2,9 +2,14 @@ package views;
 
 import java.net.URL;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,6 +22,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -26,13 +33,17 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import managers.AppDataBaseManager;
 import managers.StringsManager;
 import models.Depot;
 import models.Product;
 import models.ProductStock;
+import models.ui.AlertError;
 import models.ui.ProductSearchPickedProductDelegate;
 import models.ui.StringConverterInteger;
+import models.ui.TimesSpinerConfigurator;
 
 public class StockTransferController implements Initializable, ProductSearchPickedProductDelegate{
 
@@ -45,6 +56,11 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	@FXML TextField txtQnt;
 
 	@FXML DatePicker date;
+
+	@FXML Label lblFromDepot;
+
+	@FXML Spinner<Integer> spinerHoures;
+	@FXML Spinner<Integer> spinerMinutes;
 
 	@FXML ComboBox<Depot> comboBoxFromDepot;
 	@FXML ComboBox<Depot> comboBoxToDepot;
@@ -65,9 +81,15 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
+		configureTimeView();
+
 		comboBoxFromDepot.setItems(fromDepotsList);
 		comboBoxToDepot.setItems(toDepotsList);
-		
+
+
+		DepotChangeListener depotChangeListener = new DepotChangeListener();
+		comboBoxFromDepot.valueProperty().addListener(depotChangeListener);
+		comboBoxToDepot.valueProperty().addListener(depotChangeListener);
 
 		columnCode.setCellValueFactory(new PropertyValueFactory<>("Code"));
 		columnName.setCellValueFactory(new PropertyValueFactory<>("Name"));
@@ -83,6 +105,8 @@ public class StockTransferController implements Initializable, ProductSearchPick
 
 
 		ActionEventHandler actionEventHandler = new ActionEventHandler();
+		btnTransfere.setOnAction(actionEventHandler);
+		btnCancel.setOnAction(actionEventHandler);
 		txtCode.setOnAction(actionEventHandler);
 		txtQnt.setOnAction(actionEventHandler);
 
@@ -105,15 +129,93 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		}
 	}
 
-	private void closeStage(){
-		//((Stage) containerFP.getScene().getWindow()).close();
+	public void forceSetTransferFromAdminMode(){
+		comboBoxFromDepot.setVisible(false);
+		lblFromDepot.setVisible(false);
+
+		try {
+			comboBoxFromDepot.setValue(AppDataBaseManager.shared.getAdminDepot());
+		} catch (SQLException e) {
+			AlertError alert = new AlertError("ERROR ERR0005", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();
+		}
+
 	}
-	
+
+	private void configureTimeView(){
+		TimesSpinerConfigurator timesSpinerConfigurator = new TimesSpinerConfigurator(spinerHoures, spinerMinutes);
+		timesSpinerConfigurator.configure();
+
+		date.setConverter(new StringConverter<LocalDate>()
+		{
+			private DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+			@Override
+			public String toString(LocalDate localDate)
+			{
+				return dateTimeFormatter.format(localDate);
+			}
+
+			@Override
+			public LocalDate fromString(String dateString)
+			{
+				return LocalDate.parse(dateString,dateTimeFormatter);
+			}
+		});
+
+		date.setValue(LocalDate.now());
+	}
+
+
+	private void transferTheProducts(){
+
+		if (comboBoxFromDepot.getValue() == null) {
+			return;
+		}
+
+		if (comboBoxToDepot.getValue() == null) {
+			return;
+		}
+
+		if (productsStockData.size() < 1){
+			return;
+		}
+
+
+		LocalDateTime localDateTime = 
+				date.getValue().atTime(spinerHoures.getValue(), spinerMinutes.getValue());
+		Timestamp timestamp = Timestamp.valueOf(localDateTime);
+
+		ArrayList<ProductStock> productsWithStocks = new ArrayList<>();
+
+		for (int i=0; i<productsStockData.size(); i++) {
+			productsWithStocks.add(productsStockData.get(i));
+		}
+
+		try {
+			AppDataBaseManager.shared.transferStock(comboBoxFromDepot.getValue().getCode(), 
+					comboBoxToDepot.getValue().getCode(), productsWithStocks, timestamp);
+
+			closeStage();
+		} catch (SQLException e) {
+			AlertError alert = new AlertError("ERROR ERR0006", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();			
+		}
+	}
+
+	private void closeStage(){
+		((Stage)tableViewProductsStocksTransfert.getScene().getWindow()).close();
+	}
+
 	private class ActionEventHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
 
-			if (event.getSource() == txtCode) {
+			if (event.getSource() == btnTransfere) {
+				transferTheProducts();
+			}else if (event.getSource() == btnCancel) {
+				closeStage();
+			}else if (event.getSource() == txtCode) {
 
 				try {
 					Product product = AppDataBaseManager.shared.getProductByCode(txtCode.getText());
@@ -175,7 +277,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		@Override
 		public void handle(KeyEvent event) {
 			if (event.getSource() == txtCode && event.getCode() == KeyCode.SPACE) {
-				
+
 				RootViewController.selfRef.presentProductSearchView(comboBoxFromDepot.getSelectionModel().getSelectedItem()
 						,StockTransferController.this, txtCode.getText(), "");
 			}
@@ -231,6 +333,24 @@ public class StockTransferController implements Initializable, ProductSearchPick
 				ProductStock productStock = productsStockData.get(event.getTablePosition().getRow());
 				productStock.setQnt(event.getNewValue());
 			}
+		}
+
+	}
+
+
+	private class DepotChangeListener implements ChangeListener<Depot> {
+
+		@Override
+		public void changed(ObservableValue<? extends Depot> observable, Depot oldValue, Depot newValue) {
+			if (comboBoxFromDepot.getValue() == comboBoxToDepot.getValue()) {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						comboBoxToDepot.setValue(null);
+					}
+				});
+			}
+
 		}
 
 	}

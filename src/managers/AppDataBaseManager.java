@@ -279,6 +279,20 @@ public class AppDataBaseManager {
 
 	//Depots
 
+	
+	public Depot getAdminDepot() throws SQLException{
+		
+		Depot depot = null;
+		
+		ResultSet rs = st.executeQuery("SELECT CODE, NAME, COMMENTS FROM DEPOT WHERE CODE = 0 ;");
+		
+		if (rs.next()) {
+			depot = new Depot(rs.getInt(1), rs.getString(2), rs.getString(3));
+		}
+		
+		return depot;
+	}
+	
 	public boolean isDepotNameExist(String name) throws SQLException{
 
 		PreparedStatement pst = con.prepareStatement("SELECT CODE FROM DEPOT where NAME = ? ;");

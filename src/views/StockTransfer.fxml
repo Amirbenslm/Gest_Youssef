@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -16,12 +17,20 @@
          <children>
             <AnchorPane prefHeight="653.0" prefWidth="791.0">
                <children>
-                  <DatePicker fx:id="date" layoutX="557.0" layoutY="53.0" prefHeight="25.0" prefWidth="180.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
-                  <Label layoutX="369.0" layoutY="216.0" text="Vers : " AnchorPane.rightAnchor="330.0" AnchorPane.topAnchor="65.0" />
-                  <ComboBox fx:id="comboBoxToDepot" layoutX="464.0" layoutY="211.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0" />
-                  <Label layoutX="552.0" layoutY="20.0" text="Date : " AnchorPane.rightAnchor="199.0" AnchorPane.topAnchor="20.0" />
-                  <ComboBox fx:id="comboBoxFromDepot" layoutX="78.0" layoutY="200.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="60.0" />
-                  <Label layoutX="15.0" layoutY="205.0" text="Depuis : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="65.0" />
+                  <FlowPane alignment="CENTER_RIGHT" hgap="5.0" layoutX="18.0" layoutY="9.0" prefHeight="40.0" prefWidth="761.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0">
+                     <children>
+                        <Label text="Date :" />
+                        <DatePicker fx:id="date" editable="false" prefHeight="25.0" prefWidth="180.0" />
+                        <Label text="      Heure :" />
+                        <Spinner fx:id="spinerHoures" editable="true" maxWidth="60.0" minWidth="60.0" prefHeight="27.0" prefWidth="60.0" />
+                        <Label text=":" />
+                        <Spinner fx:id="spinerMinutes" editable="true" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" />
+                     </children>
+                  </FlowPane>
+                  <Label layoutX="369.0" layoutY="216.0" text="Vers : " AnchorPane.rightAnchor="330.0" AnchorPane.topAnchor="85.0" />
+                  <ComboBox fx:id="comboBoxToDepot" layoutX="464.0" layoutY="211.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="80.0" />
+                  <ComboBox fx:id="comboBoxFromDepot" layoutX="78.0" layoutY="200.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="80.0" />
+                  <Label fx:id="lblFromDepot" layoutX="15.0" layoutY="205.0" text="Depuis : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="85.0" />
                   <TableView fx:id="tableViewProductsStocksTransfert" editable="true" layoutX="42.0" layoutY="151.0" prefHeight="218.0" prefWidth="248.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="120.0">
                     <columns>
                       <TableColumn fx:id="columnCode" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" text="Code" />
