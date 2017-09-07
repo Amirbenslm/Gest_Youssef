@@ -28,12 +28,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import managers.AppDataBaseManager;
 import managers.StringsManager;
@@ -41,6 +43,7 @@ import models.Depot;
 import models.Product;
 import models.ProductStock;
 import models.ui.AlertError;
+import models.ui.AlertSucces;
 import models.ui.ProductSearchPickedProductDelegate;
 import models.ui.StringConverterInteger;
 import models.ui.TimesSpinerConfigurator;
@@ -71,6 +74,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	@FXML TableColumn<ProductStock, Integer> columnQNT;
 
 	private StringsManager stringsManager = new StringsManager();
+	private boolean fromAdminMode = false;
 
 	private ArrayList<Depot> allDepots;
 	private ObservableList<Depot> toDepotsList = FXCollections.observableArrayList();
@@ -86,10 +90,8 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		comboBoxFromDepot.setItems(fromDepotsList);
 		comboBoxToDepot.setItems(toDepotsList);
 
-
-		DepotChangeListener depotChangeListener = new DepotChangeListener();
-		comboBoxFromDepot.valueProperty().addListener(depotChangeListener);
-		comboBoxToDepot.valueProperty().addListener(depotChangeListener);
+		comboBoxFromDepot.valueProperty().addListener(new DepotChangeListener(comboBoxFromDepot));
+		comboBoxToDepot.valueProperty().addListener(new DepotChangeListener(comboBoxToDepot));
 
 		columnCode.setCellValueFactory(new PropertyValueFactory<>("Code"));
 		columnName.setCellValueFactory(new PropertyValueFactory<>("Name"));
@@ -102,7 +104,8 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		tableViewProductsStocksTransfert.setOnMousePressed(new TableViewMousePressedHandler());
 
 		tableViewProductsStocksTransfert.setItems(productsStockData);
-
+		
+		tableViewProductsStocksTransfert.setRowFactory(new TableViewRowFactory());
 
 		ActionEventHandler actionEventHandler = new ActionEventHandler();
 		btnTransfere.setOnAction(actionEventHandler);
@@ -129,13 +132,19 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		}
 	}
 
+	
 	public void forceSetTransferFromAdminMode(){
+		fromAdminMode = true;
+		
 		comboBoxFromDepot.setVisible(false);
 		lblFromDepot.setVisible(false);
 
 		try {
 			comboBoxFromDepot.setValue(AppDataBaseManager.shared.getAdminDepot());
 		} catch (SQLException e) {
+			tableViewProductsStocksTransfert.setVisible(false);
+			txtCode.setVisible(false);
+			comboBoxToDepot.setVisible(false);
 			AlertError alert = new AlertError("ERROR ERR0005", "SQL error code : "+e.getErrorCode(),e.getMessage());
 			alert.showAndWait();
 		}
@@ -168,7 +177,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 
 
 	private void transferTheProducts(){
-
+		
 		if (comboBoxFromDepot.getValue() == null) {
 			return;
 		}
@@ -195,6 +204,14 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		try {
 			AppDataBaseManager.shared.transferStock(comboBoxFromDepot.getValue().getCode(), 
 					comboBoxToDepot.getValue().getCode(), productsWithStocks, timestamp);
+			
+			if (fromAdminMode) {
+				AlertSucces alert = new AlertSucces("Entrées en stock effectué avec succès", null, "Entrées en stock effectué avec succès !");
+				alert.showAndWait();
+			}else{
+				AlertSucces alert = new AlertSucces("Transfert effectué avec succès", null, "Transfert effectué avec succès !");
+				alert.showAndWait();				
+			}
 
 			closeStage();
 		} catch (SQLException e) {
@@ -332,6 +349,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 			}else{
 				ProductStock productStock = productsStockData.get(event.getTablePosition().getRow());
 				productStock.setQnt(event.getNewValue());
+				tableViewProductsStocksTransfert.refresh();
 			}
 		}
 
@@ -340,8 +358,19 @@ public class StockTransferController implements Initializable, ProductSearchPick
 
 	private class DepotChangeListener implements ChangeListener<Depot> {
 
+		private ComboBox<Depot> comboBox;
+		
+		public DepotChangeListener(ComboBox<Depot> comboBox) {
+			this.comboBox = comboBox;
+		}
+		
 		@Override
 		public void changed(ObservableValue<? extends Depot> observable, Depot oldValue, Depot newValue) {
+			
+			if (comboBoxFromDepot == comboBox) {
+				tableViewProductsStocksTransfert.refresh();
+			}
+			
 			if (comboBoxFromDepot.getValue() == comboBoxToDepot.getValue()) {
 				Platform.runLater(new Runnable() {
 					@Override
@@ -353,6 +382,41 @@ public class StockTransferController implements Initializable, ProductSearchPick
 
 		}
 
+	}
+	
+	
+	private class TableViewRowFactory implements Callback<TableView<ProductStock>, TableRow<ProductStock>> {
+		@Override
+		public TableRow<ProductStock> call(TableView<ProductStock> param) {
+			return new TableRow<ProductStock>() {
+				@Override
+				protected void updateItem(ProductStock item, boolean empty) {
+					super.updateItem(item, empty);
+					
+					if (item == null || comboBoxFromDepot.getValue() == null || fromAdminMode) {
+						setStyle("");
+					}else {
+						try {
+							int availableStock = AppDataBaseManager.shared.getProductsStock(item.getCode(), 
+									comboBoxFromDepot.getValue().getCode());
+							
+							if (availableStock >= item.getQnt()) {
+								setStyle("");
+							}else{
+								setStyle("-fx-background-color: red;");
+							}
+							
+						} catch (SQLException e) {
+							setStyle("");
+							AlertError alert = new AlertError("ERROR ERR0007", "SQL error code : "+e.getErrorCode(),e.getMessage());
+							alert.showAndWait();
+						}
+						
+					}
+			       
+				}
+			};
+		}
 	}
 
 	@Override
