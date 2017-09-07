@@ -40,7 +40,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	@FXML Button btnEntryStock;
 	@FXML Button btnTransferStock;
 	@FXML Button btnAddDepot;
-	@FXML Button btnDepot;
+	@FXML Button btnDepots;
 	@FXML Button btnInventaires;
 	@FXML Button btnAddInventaire;
 
@@ -65,7 +65,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		btnEntryStock.setOnAction(this);
 		btnTransferStock.setOnAction(this);
 		btnAddDepot.setOnAction(this);
-		btnDepot.setOnAction(this);
+		btnDepots.setOnAction(this);
 		btnInventaires.setOnAction(this);
 		btnAddInventaire.setOnAction(this);
 
@@ -110,7 +110,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 		else if (event.getSource() == btnAddClient) {
-			System.out.println("hhh");
+			showAddNewClientView();
 		}
 
 		else if (event.getSource() == btnFactures) {
@@ -141,8 +141,8 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			showAddNewDepotView();
 		}
 
-		else if (event.getSource() == btnDepot) {
-			System.out.println("hhh");
+		else if (event.getSource() == btnDepots) {
+			showAllDepotsView();
 		}
 
 		else if (event.getSource() == btnInventaires) {
@@ -155,7 +155,18 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
+	private void showAddNewClientView(){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddClient.fxml"));
+			Pane p = loader.load();
 
+			showPaneInAlertMode("BLA", p, 660, 450);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private void showAllProductView(){
 
@@ -194,6 +205,19 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			Pane p = loader.load();
 
 			showPaneInAlertMode("BLABLA", p, 500, 300);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void showAllDepotsView(){
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AllDepots.fxml"));
+			Pane p = loader.load();
+			showPaneInContainer(p);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
