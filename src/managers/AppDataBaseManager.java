@@ -123,6 +123,30 @@ public class AppDataBaseManager {
 
 				
 				st.executeUpdate("INSERT INTO Depot (NAME) VALUES ('ADMIN');");
+				
+				
+				
+				st.executeUpdate("CREATE TABLE Client ("
+						+ "CODE VARCHAR_IGNORECASE(30) NOT NULL, "
+						+ "NAME VARCHAR_IGNORECASE(25) NOT NULL, "
+						+ "LASTNAME VARCHAR_IGNORECASE(25) NOT NULL, "
+						+ "ADRESSE VARCHAR_IGNORECASE(400) DEFAULT '', "
+						+ "SOLDCASH DOUBLE DEFAULT 0, "
+						+ "SOLDCHECK DOUBLE DEFAULT 0, "
+						+ "PRIMARY KEY (CODE) );");
+				
+				
+				st.executeUpdate("CREATE TABLE PhoneNumber ("
+						+ "number VARCHAR_IGNORECASE(30) NOT NULL, "
+						+ "type VARCHAR_IGNORECASE(5) NOT NULL, "
+						+ "code_client VARCHAR_IGNORECASE(30) NOT NULL, "
+						+ "CHECK(type IN ('fax','phone')), "
+						+ "PRIMARY KEY (number, type,code_client), "
+						+ "CONSTRAINT fkClientPhoneNumber FOREIGN KEY (code_client) "
+						+ "REFERENCES Client (CODE) ON DELETE CASCADE ON UPDATE CASCADE );");
+				
+				
+				
 			}
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
