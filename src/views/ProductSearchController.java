@@ -5,6 +5,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,6 +23,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import managers.AppDataBaseManager;
+import managers.StringsManager;
 import models.Depot;
 import models.Product;
 import models.ProductStock;
@@ -40,6 +44,8 @@ public class ProductSearchController implements Initializable {
 	@FXML TableColumn<ProductStock, Integer> columnStock;
 
 	public ProductSearchPickedProductDelegate delegate;
+	
+	private StringsManager stringsManager = new StringsManager();
 
 	private Depot depot;
 	private ObservableList<ProductStock> productsStockData = FXCollections.observableArrayList();
@@ -57,6 +63,9 @@ public class ProductSearchController implements Initializable {
 		btnSearch.setOnAction(actionEventHandler);
 		txtCode.setOnAction(actionEventHandler);
 		txtName.setOnAction(actionEventHandler);
+		
+		TextFieldChangeListener textFieldChangeListener = new TextFieldChangeListener();
+		txtCode.textProperty().addListener(textFieldChangeListener);
 
 		tableViewProductsStocks.setOnMousePressed(new TableViewMousePressedHandler());
 
@@ -136,10 +145,27 @@ public class ProductSearchController implements Initializable {
 					&& tableViewProductsStocks.getSelectionModel().getSelectedItem() != null) {
 				Product product = tableViewProductsStocks.getSelectionModel().getSelectedItem();
 
-				RootViewController.selfRef.presentProductsEditsView(product);
+				RootViewController.selfRef.presentProductDetailsView(product);
 			}
 
 		}
 
 	}
+	
+	private class TextFieldChangeListener implements ChangeListener<String> {
+
+		@Override
+		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+			TextField txt = (TextField) ((StringProperty)observable).getBean();
+
+			if (txt == txtCode) {
+				String ch = txt.getText().replaceAll(" ", "");
+				ch = stringsManager.getOnlyLettersAndNumbers(ch);
+				txt.setText(ch.toUpperCase());
+			}
+
+		}
+
+	}
+	
 }

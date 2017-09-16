@@ -21,7 +21,7 @@ import models.ui.AlertError;
 
 public class AddClientController implements Initializable{
 
-	static private String STRING_TAP_TO_ADD_NEW_CLIENT = "Add (+)";
+	static private String STRING_TAP_TO_ADD_NEW_CLIENT = "Ajouter (+)";
 
 	@FXML Button btnSave;
 	@FXML Button btnCancel;

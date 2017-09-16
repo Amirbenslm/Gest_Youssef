@@ -38,10 +38,12 @@ public class TimesSpinerConfigurator {
 
 		custumStringConverterInteger = new CustumStringConverterInteger();
 
-		integerSpinnerValueFactoryHoures = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, calendar.get(Calendar.HOUR_OF_DAY));
+		integerSpinnerValueFactoryHoures = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 
+				calendar.get(Calendar.HOUR_OF_DAY));
 		integerSpinnerValueFactoryHoures.setConverter(custumStringConverterInteger);
 
-		integerSpinnerValueFactoryMinutes = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, calendar.get(Calendar.MINUTE));
+		integerSpinnerValueFactoryMinutes = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59,
+				calendar.get(Calendar.MINUTE));
 		integerSpinnerValueFactoryMinutes.setConverter(custumStringConverterInteger);
 
 		spinerHoures.setValueFactory(integerSpinnerValueFactoryHoures);

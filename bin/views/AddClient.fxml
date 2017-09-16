@@ -10,20 +10,10 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="660.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.AddClientController">
+<AnchorPane maxHeight="350.0" maxWidth="-Infinity" minHeight="350.0" minWidth="-Infinity" prefHeight="350.0" prefWidth="660.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.AddClientController">
    <children>
-      <FlowPane alignment="CENTER" prefHeight="100.0" prefWidth="652.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
-         <children>
-            <Label text="Ajouter client">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-         </children>
-      </FlowPane>
-      <GridPane layoutX="38.0" layoutY="41.0" prefHeight="220.0" prefWidth="270.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="130.0">
+      <GridPane layoutX="38.0" layoutY="41.0" prefHeight="220.0" prefWidth="270.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="30.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="278.0" minWidth="10.0" prefWidth="273.0" />
@@ -45,7 +35,7 @@
             <TextArea fx:id="txtAdress" maxWidth="200.0" minWidth="200.0" prefHeight="100.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
-      <GridPane layoutX="343.0" layoutY="56.0" prefHeight="214.0" prefWidth="257.0" AnchorPane.leftAnchor="350.0" AnchorPane.topAnchor="135.0">
+      <GridPane layoutX="343.0" layoutY="56.0" prefHeight="214.0" prefWidth="257.0" AnchorPane.leftAnchor="350.0" AnchorPane.topAnchor="35.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="166.0" />
@@ -57,7 +47,7 @@
         </rowConstraints>
          <children>
             <Label text="Téléphones :" />
-            <Label text="Faxes :" GridPane.rowIndex="2" />
+            <Label text="Fax :" GridPane.rowIndex="2" />
             <ListView fx:id="listViewPhones" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" />
             <ListView fx:id="listViewFaxes" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>

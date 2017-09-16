@@ -157,7 +157,7 @@ public class AllProductsController implements Initializable{
 				
 				Product product = tableViewProductsStocks.getSelectionModel().getSelectedItem();
 				
-				RootViewController.selfRef.presentProductsEditsView(product);
+				RootViewController.selfRef.presentProductDetailsView(product);
 
 			}
 			

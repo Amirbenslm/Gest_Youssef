@@ -53,6 +53,10 @@ public class StringsManager {
 	public String getDoubleFormat(String text){
 		String ch = "";
 		
+		while (text.length() > 1 && text.startsWith("00")) {
+			text = text.substring(1);
+		}
+		
 		if (text.length() > 0 && text.charAt(0) == '.') {
 			text = "0"+text;
 		}
@@ -63,6 +67,10 @@ public class StringsManager {
 			}else if (text.charAt(i) == '.' && !ch.contains(".")){
 				ch += ".";
 			}
+		}
+		
+		if ( ch.startsWith("0") && ( (ch.indexOf(".") > 1) || (ch.indexOf(".") == -1 && ch.length()>1) ) ) {
+			ch = ch.substring(1);
 		}
 		
 		return ch;

@@ -19,6 +19,8 @@ import javafx.stage.Stage;
 import models.Depot;
 import models.Product;
 import models.ViewController;
+import models.ui.AddPaymentDelegate;
+import models.ui.ClientSearchPickedClientDelegate;
 import models.ui.ProductSearchPickedProductDelegate;
 
 public class RootViewController implements Initializable, EventHandler<ActionEvent>{
@@ -114,11 +116,11 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 		else if (event.getSource() == btnFactures) {
-			System.out.println("hhh");
+			showBillDetailsView();
 		}
 
 		else if (event.getSource() == btnAddFacture) {
-			System.out.println("hhh");
+			showAddNewBillView();
 		}
 
 		else if (event.getSource() == btnArticles) {
@@ -161,13 +163,65 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/AddClient.fxml"));
 			Pane p = loader.load();
 
-			showPaneInAlertMode("BLA", p, 660, 450);
+			showPaneInAlertMode("Ajouter client", p, 660, 350);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void presentClientDetailsView(String clientCode){
+		showAddNewClientView();
+	}
+	
+	
+	private void showBillDetailsView(){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditBill.fxml"));
+			Pane p = loader.load();
+			AddEditBillController controller = loader.getController();
+			controller.showBillDetails("0170900002");
+			showPaneInAlertMode("BLA", p, 1400, 750);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void showAddNewBillView(){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditBill.fxml"));
+			Pane p = loader.load();
+
+			showPaneInAlertMode("BLA", p, 1400, 750);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	
+	public void presentAddPaymentView(String forBillCode,double amountTotalToPay, double amountPayed, 
+			AddPaymentDelegate delegate){
+		
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddPayement.fxml"));
+			Pane p = loader.load();
+			AddPayementController addPayementController = loader.getController();
+			addPayementController.setupDetails(forBillCode, amountTotalToPay, amountPayed);
+			addPayementController.delegate = delegate;
+			
+			showPaneInAlertMode("BLA", p, 930, 340);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	private void showAllProductView(){
 
 		try {
@@ -232,7 +286,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/StockTransfer.fxml"));
 			Pane p = loader.load();
 			( (StockTransferController) loader.getController() ).forceSetTransferFromAdminMode();
-			showPaneInAlertMode("BLABLA", p, 830, 730);
+			showPaneInAlertMode("BLABLA", p, 900, 730);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -248,7 +302,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/StockTransfer.fxml"));
 			Pane p = loader.load();
 
-			showPaneInAlertMode("BLABLA", p, 830, 730);
+			showPaneInAlertMode("BLABLA", p, 900, 730);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -257,7 +311,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	}
 
 
-	public void presentProductsEditsView(Product product){
+	public void presentProductDetailsView(Product product){
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("/views/AddEditProductDetails.fxml"));
@@ -272,8 +326,30 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			e.printStackTrace();
 		}
 	}
+	
+	//Enter "" empty string in search constraint to disable the associated constraint
+	public void presentClientSearchView(String forClientCode, ClientSearchPickedClientDelegate delegate){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/ClientSearch.fxml"));
+			Pane p = loader.load();
+			ClientSearchController clientSearchController = loader.getController();
+			clientSearchController.delegate = delegate;
+			
+			if (! forClientCode.equals("") ){
+				clientSearchController.forceSearch(forClientCode);
+			}
+			
+			showPaneInAlertMode("BLA", p, 1135, 500);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
 
-	//Enter "" empty string in search constraint to disable it
+	//Enter "" empty string in search constraint to disable the associated constraint
 	public void presentProductSearchView(Depot forDepot, ProductSearchPickedProductDelegate delegate, 
 			String forProductCode, String forProductName){
 		try {

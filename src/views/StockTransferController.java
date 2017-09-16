@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -36,7 +35,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import managers.AppDataBaseManager;
 import managers.StringsManager;
 import models.Depot;
@@ -44,6 +42,7 @@ import models.Product;
 import models.ProductStock;
 import models.ui.AlertError;
 import models.ui.AlertSucces;
+import models.ui.StringConverterLocalDate;
 import models.ui.ProductSearchPickedProductDelegate;
 import models.ui.StringConverterInteger;
 import models.ui.TimesSpinerConfigurator;
@@ -155,22 +154,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		TimesSpinerConfigurator timesSpinerConfigurator = new TimesSpinerConfigurator(spinerHoures, spinerMinutes);
 		timesSpinerConfigurator.configure();
 
-		date.setConverter(new StringConverter<LocalDate>()
-		{
-			private DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-			@Override
-			public String toString(LocalDate localDate)
-			{
-				return dateTimeFormatter.format(localDate);
-			}
-
-			@Override
-			public LocalDate fromString(String dateString)
-			{
-				return LocalDate.parse(dateString,dateTimeFormatter);
-			}
-		});
+		date.setConverter(new StringConverterLocalDate());
 
 		date.setValue(LocalDate.now());
 	}
@@ -294,7 +278,6 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		@Override
 		public void handle(KeyEvent event) {
 			if (event.getSource() == txtCode && event.getCode() == KeyCode.SPACE) {
-
 				RootViewController.selfRef.presentProductSearchView(comboBoxFromDepot.getSelectionModel().getSelectedItem()
 						,StockTransferController.this, txtCode.getText(), "");
 			}
@@ -312,7 +295,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 					&& tableViewProductsStocksTransfert.getSelectionModel().getSelectedItem() != null)  {
 
 				Product product = tableViewProductsStocksTransfert.getSelectionModel().getSelectedItem();
-				RootViewController.selfRef.presentProductsEditsView(product);
+				RootViewController.selfRef.presentProductDetailsView(product);
 
 			}
 

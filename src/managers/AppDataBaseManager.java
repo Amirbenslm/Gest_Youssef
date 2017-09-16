@@ -7,15 +7,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import exceptions.DataBaseDriverLoadFailedException;
+import models.Bill;
+import models.Client;
 import models.Depot;
+import models.Payment;
 import models.Product;
+import models.ProductBill;
 import models.ProductPrice;
 import models.ProductStock;
 
 public class AppDataBaseManager {
+	
+	static private String PAYMENT_TYPE_CHECK = "CHECK";
+	static private String PAYMENT_TYPE_CASH = "CASH";
 
 	static public AppDataBaseManager shared = new AppDataBaseManager();
 
@@ -131,8 +139,6 @@ public class AppDataBaseManager {
 						+ "NAME VARCHAR_IGNORECASE(25) NOT NULL, "
 						+ "LASTNAME VARCHAR_IGNORECASE(25) NOT NULL, "
 						+ "ADRESSE VARCHAR_IGNORECASE(400) DEFAULT '', "
-						+ "SOLDCASH DOUBLE DEFAULT 0, "
-						+ "SOLDCHECK DOUBLE DEFAULT 0, "
 						+ "PRIMARY KEY (CODE) );");
 				
 				
@@ -146,6 +152,42 @@ public class AppDataBaseManager {
 						+ "REFERENCES Client (CODE) ON DELETE CASCADE ON UPDATE CASCADE );");
 				
 				
+				st.executeUpdate("CREATE TABLE BILL ( "
+						+ "code VARCHAR_IGNORECASE(20) NOT NULL, "
+						+ "date DATETIME NOT NULL, "
+						+ "discount DOUBLE NOT NULL, "
+						+ "code_client VARCHAR_IGNORECASE(30) NOT NULL, "
+						+ "code_depot INTEGER NOT NULL, "
+						+ "CHECK( discount >= 0 and discount <= 100), "
+						+ "PRIMARY KEY (code), "
+						+ "CONSTRAINT fkBillClient FOREIGN KEY (code_client) "
+						+ "REFERENCES Client (CODE) ON DELETE CASCADE ON UPDATE CASCADE, "
+						+ "CONSTRAINT fkBillDepot FOREIGN KEY (code_depot) "
+						+ "REFERENCES DEPOT (CODE) ON DELETE CASCADE ON UPDATE CASCADE);");
+				
+				
+				st.executeUpdate("CREATE TABLE BillProducts ( "
+						+ "code_bill VARCHAR_IGNORECASE(20) NOT NULL, "
+						+ "code_product VARCHAR_IGNORECASE(20) NOT NULL, "
+						+ "QNT INTEGER NOT NULL, "
+						+ "price DOUBLE NOT NULL, "
+						+ "PRIMARY KEY (code_bill, code_product), "
+						+ "CONSTRAINT fkBillProduct FOREIGN KEY (code_product) "
+						+ "REFERENCES Product (code) ON DELETE CASCADE ON UPDATE CASCADE, "
+						+ "CONSTRAINT fkBillCode FOREIGN KEY (code_bill) "
+						+ "REFERENCES BILL (CODE) ON DELETE CASCADE ON UPDATE CASCADE);");
+				
+				
+				st.executeUpdate("CREATE TABLE PAYMENT ( "
+						+ "id INTEGER NOT NULL IDENTITY, "
+						+ "date DATETIME NOT NULL, "
+						+ "type VARCHAR_IGNORECASE(5) NOT NULL, "
+						+ "amount DOUBLE NOT NULL, "
+						+ "code_bill VARCHAR_IGNORECASE(20) NOT NULL, "
+						+ "CHECK( type in ('cash','check') ), "
+						+ "PRIMARY KEY (id), "
+						+ "CONSTRAINT fkPaymentBillCode FOREIGN KEY (code_bill) "
+						+ "REFERENCES BILL (CODE) ON DELETE CASCADE ON UPDATE CASCADE);");
 				
 			}
 		} catch (SQLException e1) {
@@ -166,6 +208,190 @@ public class AppDataBaseManager {
 	}
 
 
+	//Clients
+	
+	
+	//if don't want to search with constraint pass "" not null
+	public ArrayList<String> getAllClientsCodes(String codeLike, String nameLike, String lastNameLike
+			, String addressLike) throws SQLException{
+		ArrayList<String> allClientsCodes = new ArrayList<>();
+
+		PreparedStatement pst = con.prepareStatement("SELECT CODE FROM CLIENT "
+				+ "WHERE CODE LIKE ? and NAME LIKE ? and LASTNAME LIKE ? and ADRESSE LIKE ? ;");
+
+		pst.setString(1, "%"+codeLike+"%");
+		pst.setString(2, "%"+nameLike+"%");
+		pst.setString(3, "%"+lastNameLike+"%");
+		pst.setString(4, "%"+addressLike+"%");
+
+		ResultSet rs = pst.executeQuery();
+
+
+		while (rs.next()) {
+			allClientsCodes.add(rs.getString(1));
+		}
+
+		return allClientsCodes;
+	}
+	
+	public ArrayList<String> getAllClientsCodes() throws SQLException{
+		return getAllClientsCodes("", "", "", "");
+	}
+	
+	
+	public Client getClientByCode(String code) throws SQLException{
+		Client client = null;
+
+		ResultSet rs = st.executeQuery("SELECT CODE, NAME, LASTNAME, ADRESSE FROM CLIENT "
+				+ "WHERE CODE = '"+code+"';");
+
+		if (rs.next()) {
+			client = new Client(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4));
+		}
+
+		return client;
+	}
+	
+	
+	
+	//Bills
+	
+	private String createNewBillCode() throws SQLException{
+		
+		LocalDate date = LocalDate.now();
+		
+		String year = date.getYear()+"";
+		String month = date.getMonthValue()+"";
+		
+		if (month.length() == 1) {
+			month = "0"+month;
+		}
+
+		PreparedStatement ps = con.prepareStatement("SELECT Count(CODE) FROM BILL WHERE DATE >= ? and DATE <= ? ;");
+		
+		ps.setString(1, year+"-"+month+"-"+"01");
+		ps.setString(2, year+"-"+month+"-"+date.getMonth().maxLength());
+		
+		ResultSet rs = ps.executeQuery();
+		rs.next();
+		int billsCount = rs.getInt(1);
+		billsCount++;
+		
+		String billsCountString = Integer.toString(billsCount);
+		
+		while (billsCountString.length() < 5) {
+			billsCountString = "0" + billsCountString;
+		}
+		
+		return year.substring(1)+month+billsCountString;
+	}
+	
+	public String createNewBill(Bill bill) throws SQLException{
+		String billCode = createNewBillCode();
+		
+		PreparedStatement psCreateNewBill = con.prepareStatement("INSERT INTO BILL "
+				+ "(CODE, DATE, DISCOUNT, CODE_CLIENT, CODE_DEPOT) VALUES (?, ?, ?, ?, ?);");
+		psCreateNewBill.setString(1, billCode);
+		psCreateNewBill.setTimestamp(2, bill.getDate());
+		psCreateNewBill.setDouble(3, bill.getDiscount());
+		psCreateNewBill.setString(4, bill.getClientCode());
+		psCreateNewBill.setInt(5, bill.getDepotCode());
+		
+		psCreateNewBill.executeUpdate();
+		
+		PreparedStatement psAddProductToBill = con.prepareStatement("INSERT INTO BILLPRODUCTS "
+				+ "(CODE_BILL, CODE_PRODUCT, QNT, PRICE) "
+				+ "VALUES (?, ?, ?, ?);");
+		PreparedStatement psUpdateStock = con.prepareStatement("UPDATE STOCK SET QNT = QNT - ? "
+				+ "WHERE CODE_DEPOT = ? and CODE_PRODUCT = ?;");
+		
+		psAddProductToBill.setString(1, billCode);
+		
+		ArrayList<ProductBill> billsProducts = bill.getProducts();
+		
+		for (int i=0; i<billsProducts.size(); i++) {
+			ProductBill product = billsProducts.get(i);
+			psAddProductToBill.setString(2, product.getCode());
+			psAddProductToBill.setInt(3, product.getQnt());
+			psAddProductToBill.setDouble(4, product.getPriceSelled());
+			
+			psUpdateStock.setInt(1, product.getQnt());
+			psUpdateStock.setInt(2, bill.getDepotCode());
+			psUpdateStock.setString(3, product.getCode());
+			
+			psAddProductToBill.executeUpdate();
+			psUpdateStock.executeUpdate();
+		}
+		
+		
+		return billCode;
+	}
+	
+	public Bill getBillByCode(String billCode) throws SQLException{
+		
+		ResultSet rsBillDetails = st.executeQuery("SELECT CODE, DATE, DISCOUNT, CODE_CLIENT, CODE_DEPOT "
+				+ "FROM BILL WHERE code = '"+billCode+"' ;");
+		if (!rsBillDetails.next()) {
+			return null;
+		}
+		
+		ArrayList<ProductBill> products = new ArrayList<>();
+		
+		ResultSet rsBillProducts = st.executeQuery("SELECT CODE_PRODUCT, QNT, PRICE "
+				+ "FROM BILLPRODUCTS WHERE CODE_BILL = '"+billCode+"' ;");
+		
+		while (rsBillProducts.next()) {
+			Product product = getProductByCode(rsBillProducts.getString(1));
+			product.setPrice(getProductPrice(product.getCode(), rsBillDetails.getTimestamp(2)));
+			products.add(new ProductBill(product, rsBillProducts.getDouble(3), rsBillProducts.getInt(2)));
+		}
+		
+		return new Bill(billCode, rsBillDetails.getString(4), rsBillDetails.getInt(5), 
+				rsBillDetails.getTimestamp(2), rsBillDetails.getDouble(3), products) ;
+	}
+
+	//Payments
+	
+	public void addPaymentToBill(String billCode, Payment payment) throws SQLException{
+		String paymentType = "";
+		
+		if (payment.getType().toUpperCase().equals(Payment.TYPE_CASH.toUpperCase())) {
+			paymentType = PAYMENT_TYPE_CASH;
+		}else if (payment.getType().toUpperCase().equals(Payment.TYPE_CHECK.toUpperCase())) {
+			paymentType = PAYMENT_TYPE_CHECK;
+		}
+		
+		PreparedStatement ps = con.prepareStatement("INSERT INTO PAYMENT (DATE, TYPE, AMOUNT, CODE_BILL) "
+				+ "VALUES (?, ?, ?, ?);");
+		ps.setTimestamp(1, payment.getDate());
+		ps.setString(2, paymentType);
+		ps.setDouble(3, payment.getAmmount());
+		ps.setString(4, billCode);
+		ps.executeUpdate();
+	}
+	
+	public ArrayList<Payment> getAllPaymentForBillByBillCode(String billCode) throws SQLException{
+		
+		ArrayList<Payment> allPayments = new ArrayList<>();
+		
+		ResultSet rs = st.executeQuery("SELECT DATE, TYPE, AMOUNT FROM PAYMENT WHERE"
+				+ " CODE_BILL = '"+billCode+"' ;");
+		
+		while (rs.next()) {
+			String paymentType = "";
+			
+			if (rs.getString(2).toUpperCase().equals(PAYMENT_TYPE_CASH.toUpperCase())){
+				paymentType = Payment.TYPE_CASH;
+			}else if (rs.getString(2).toUpperCase().equals(PAYMENT_TYPE_CHECK.toUpperCase())){
+				paymentType = Payment.TYPE_CHECK;
+			}
+			
+			allPayments.add(new Payment(rs.getDouble(3), paymentType, rs.getTimestamp(1)));
+		}
+		
+		return allPayments;
+	}
+	
 	//Products
 
 
@@ -341,6 +567,17 @@ public class AppDataBaseManager {
 		initStockForDepot(rs.getInt(1));
 	}
 
+	public Depot getDepotByCode(int depotCode) throws SQLException{
+		Depot depot = null;
+
+		ResultSet rs = st.executeQuery("SELECT CODE, NAME, COMMENTS FROM DEPOT WHERE CODE = '"+depotCode+"' ;");
+
+		if (rs.next()) {
+			depot = new Depot(depotCode, rs.getString(2), rs.getString(3));
+		}
+
+		return depot;
+	}
 
 	public ArrayList<Depot> getAllDepots() throws SQLException{
 
