@@ -47,7 +47,7 @@
                   <TextField fx:id="txtName" editable="false" prefHeight="27.0" prefWidth="298.0" />
                   <Label text="Quantité :" />
                   <TextField fx:id="txtQnt" editable="false" prefHeight="27.0" prefWidth="59.0" />
-                  <Button mnemonicParsing="false" text="Ajouter" />
+                  <Button fx:id="btnAddProduct" mnemonicParsing="false" text="Ajouter" />
                </children>
             </FlowPane>
          </children>

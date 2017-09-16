@@ -97,7 +97,7 @@ public class ProductSearchController implements Initializable {
 
 				Product product = AppDataBaseManager.shared.getProductByCode(productsCodes.get(i));
 
-				Integer stock = null;
+				Double stock = null;
 
 				if (depot == null) {
 					stock = AppDataBaseManager.shared.getProductsStock(productsCodes.get(i));

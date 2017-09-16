@@ -145,9 +145,10 @@ public class AddPayementController implements Initializable{
 						"La paiement du facture N°"+lblBillNumber.getText()
 						+" avec le montant "+newAmountPayed+" ("+comboBoxPaymentType.getValue()+") "
 								+ "est effectué avec succès.");
-				alertSucces.showAndWait();
-				closeStage();
+				
 				delegate.didAddNewPayment(payment);
+				closeStage();
+				alertSucces.showAndWait();
 			} catch (SQLException e) {
 				AlertError alertError = new AlertError("ERROR ERR0013", "SQL error code : "+e.getErrorCode(),e.getMessage());
 				alertError.showAndWait();

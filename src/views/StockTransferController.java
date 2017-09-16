@@ -44,13 +44,14 @@ import models.ui.AlertError;
 import models.ui.AlertSucces;
 import models.ui.StringConverterLocalDate;
 import models.ui.ProductSearchPickedProductDelegate;
-import models.ui.StringConverterInteger;
+import models.ui.StringConverterDouble;
 import models.ui.TimesSpinerConfigurator;
 
 public class StockTransferController implements Initializable, ProductSearchPickedProductDelegate{
 
 
 	@FXML Button btnTransfere;
+	@FXML Button btnAddProduct;
 	@FXML Button btnCancel;
 
 	@FXML TextField txtCode;
@@ -70,7 +71,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	@FXML TableView<ProductStock> tableViewProductsStocksTransfert;
 	@FXML TableColumn<ProductStock, String> columnCode;
 	@FXML TableColumn<ProductStock, String> columnName;
-	@FXML TableColumn<ProductStock, Integer> columnQNT;
+	@FXML TableColumn<ProductStock, Double> columnQNT;
 
 	private StringsManager stringsManager = new StringsManager();
 	private boolean fromAdminMode = false;
@@ -97,7 +98,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		columnQNT.setCellValueFactory(new PropertyValueFactory<>("Qnt"));
 
 
-		columnQNT.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterInteger()));
+		columnQNT.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterDouble()));
 		columnQNT.setOnEditCommit(new TableColumnChangeEventHandler());
 
 		tableViewProductsStocksTransfert.setOnMousePressed(new TableViewMousePressedHandler());
@@ -111,6 +112,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		btnCancel.setOnAction(actionEventHandler);
 		txtCode.setOnAction(actionEventHandler);
 		txtQnt.setOnAction(actionEventHandler);
+		btnAddProduct.setOnAction(actionEventHandler);
 
 		TextFieldChangeListener textFieldChangeListener = new TextFieldChangeListener();
 
@@ -233,13 +235,16 @@ public class StockTransferController implements Initializable, ProductSearchPick
 				}
 
 
-			}else if (event.getSource() == txtQnt) {
+			}else if (event.getSource() == txtQnt || event.getSource() == btnAddProduct) {
+				
 				try {
 					Product product = AppDataBaseManager.shared.getProductByCode(txtCode.getText());
 
-					if (product != null) {
+					if (txtQnt.getText().equals("")) {
+						txtQnt.requestFocus();
+					}else if (product != null) {
 
-						int qntToAdd = Integer.parseInt(txtQnt.getText());
+						double qntToAdd = Double.parseDouble(txtQnt.getText());
 
 						int i = 0;
 
@@ -316,17 +321,17 @@ public class StockTransferController implements Initializable, ProductSearchPick
 				txtQnt.setEditable(false);
 				txtName.setText("");
 			} else if (txt == txtQnt) {
-				txt.setText(stringsManager.getOnlyNumbers(txt.getText()));
+				txt.setText(stringsManager.getDoubleFormat(txt.getText()));
 			}
 
 		}
 
 	}
 
-	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<ProductStock, Integer>> {
+	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<ProductStock, Double>> {
 
 		@Override
-		public void handle(CellEditEvent<ProductStock, Integer> event) {
+		public void handle(CellEditEvent<ProductStock, Double> event) {
 			if (event.getNewValue() == 0) {
 				productsStockData.remove(event.getTablePosition().getRow());
 			}else{
@@ -380,7 +385,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 						setStyle("");
 					}else {
 						try {
-							int availableStock = AppDataBaseManager.shared.getProductsStock(item.getCode(), 
+							double availableStock = AppDataBaseManager.shared.getProductsStock(item.getCode(), 
 									comboBoxFromDepot.getValue().getCode());
 							
 							if (availableStock >= item.getQnt()) {

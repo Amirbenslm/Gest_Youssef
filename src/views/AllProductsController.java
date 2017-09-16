@@ -102,10 +102,10 @@ public class AllProductsController implements Initializable{
 		productsStockData.clear();
 
 
-		Integer stockMax = null;
+		Double stockMax = null;
 
 		try {
-			stockMax = Integer.parseInt(txtStockLessThan.getText());
+			stockMax = Double.parseDouble(txtStockLessThan.getText());
 		}catch (NumberFormatException e){}
 
 
@@ -122,7 +122,7 @@ public class AllProductsController implements Initializable{
 
 				product.setPrice(productPrice);
 
-				Integer stock = AppDataBaseManager.shared.getProductsStock(productsCodes.get(i));
+				Double stock = AppDataBaseManager.shared.getProductsStock(productsCodes.get(i));
 
 				productsStockData.add(new ProductStock(product, stock));
 

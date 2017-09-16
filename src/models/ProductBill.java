@@ -3,7 +3,7 @@ package models;
 public class ProductBill extends ProductStock {
 	private double priceSelled;
 	
-	public ProductBill(Product product, double priceSelled, int qnt) {
+	public ProductBill(Product product, double priceSelled, double qnt) {
 		super(product, qnt);
 		this.priceSelled = priceSelled;
 	}

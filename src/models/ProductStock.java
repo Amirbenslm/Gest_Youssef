@@ -2,18 +2,18 @@ package models;
 
 public class ProductStock extends Product{
 
-	private int qnt;
+	private double qnt;
 
-	public ProductStock(Product product, int qnt) {
+	public ProductStock(Product product, double qnt) {
 		super(product.getCode(), product.getName(), product.getPrice());
 		this.qnt = qnt;
 	}
 
-	public int getQnt() {
+	public double getQnt() {
 		return qnt;
 	}
 
-	public void setQnt(int qnt) {
+	public void setQnt(double qnt) {
 		this.qnt = qnt;
 	}
 

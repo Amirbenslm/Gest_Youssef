@@ -26,7 +26,7 @@ import models.DepotStock;
 import models.Product;
 import models.ProductPrice;
 import models.ui.AlertError;
-import models.ui.StringConverterInteger;
+import models.ui.StringConverterDouble;
 
 public class ProductDetailsController implements Initializable{
 
@@ -41,7 +41,7 @@ public class ProductDetailsController implements Initializable{
 
 	@FXML TableView<DepotStock> tableViewDepots;
 	@FXML TableColumn<DepotStock, String> columnDepotName;
-	@FXML TableColumn<DepotStock, Integer> columnStock;
+	@FXML TableColumn<DepotStock, Double> columnStock;
 
 	private StringsManager stringsManager = new StringsManager();
 
@@ -56,7 +56,7 @@ public class ProductDetailsController implements Initializable{
 		columnDepotName.setCellValueFactory(new PropertyValueFactory<>("Name"));
 		columnStock.setCellValueFactory(new PropertyValueFactory<>("Qnt"));
 
-		columnStock.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterInteger()));
+		columnStock.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterDouble()));
 		columnStock.setOnEditCommit(new TableColumnChangeEventHandler());
 
 		tableViewDepots.setItems(depotsData);
@@ -100,10 +100,9 @@ public class ProductDetailsController implements Initializable{
 			for (int i=0; i<depotsData.size(); i++) {
 
 
-				int qnt = AppDataBaseManager.shared.getProductsStock(product.getCode(), 
+				double qnt = AppDataBaseManager.shared.getProductsStock(product.getCode(), 
 						depotsData.get(i).getCode());
 				depotsData.get(i).setQnt(qnt);
-
 
 			}
 
@@ -144,10 +143,10 @@ public class ProductDetailsController implements Initializable{
 	}
 
 
-	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<DepotStock, Integer>> {
+	private class TableColumnChangeEventHandler implements EventHandler<CellEditEvent<DepotStock, Double>> {
 
 		@Override
-		public void handle(CellEditEvent<DepotStock, Integer> event) {
+		public void handle(CellEditEvent<DepotStock, Double> event) {
 			depotsData.get(event.getTablePosition().getRow()).setQnt(event.getNewValue());
 		}
 

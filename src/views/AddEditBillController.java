@@ -6,8 +6,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.SimpleDoubleProperty;
@@ -49,14 +47,12 @@ import models.Payment;
 import models.Product;
 import models.ProductBill;
 import models.ProductPrice;
-import models.ProductStock;
 import models.ui.AddPaymentDelegate;
 import models.ui.AlertError;
 import models.ui.ClientSearchPickedClientDelegate;
 import models.ui.StringConverterLocalDate;
 import models.ui.ProductSearchPickedProductDelegate;
 import models.ui.StringConverterDouble;
-import models.ui.StringConverterInteger;
 import models.ui.StringConverterTimestamp;
 import models.ui.TimesSpinerConfigurator;
 
@@ -91,7 +87,7 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 	@FXML TableColumn<ProductBill, String> columnName;
 	@FXML TableColumn<ProductBill, Double> columnBuyedPrice;
 	@FXML TableColumn<ProductBill, Double> columnSelledPrice;
-	@FXML TableColumn<ProductBill, Integer> columnQNT;
+	@FXML TableColumn<ProductBill, Double> columnQNT;
 	@FXML TableColumn<ProductBill, Double> columnTotal;
 
 	@FXML TableView<Payment> tableViewPayments;
@@ -125,6 +121,8 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 		configureTimeView();
 
 		comboBoxDepot.setItems(depotsList);
+		
+		comboBoxDepot.valueProperty().addListener(new DepotChangeListener());
 
 		columnCode.setCellValueFactory(new PropertyValueFactory<>("Code"));
 		columnName.setCellValueFactory(new PropertyValueFactory<>("Name"));
@@ -138,10 +136,13 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 		columnQNT.setCellValueFactory(new PropertyValueFactory<>("Qnt"));
 		columnTotal.setCellValueFactory(new PropertyValueFactory<>("TotalPrice"));
 
-		columnQNT.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterInteger()));
-		columnQNT.setOnEditCommit(new CellIntegerEditEventHandler());
-		columnSelledPrice.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverterDouble()));
-		columnSelledPrice.setOnEditCommit(new CellDoubleEditEventHandler());
+		StringConverterDouble stringConverterDouble = new StringConverterDouble();
+		columnQNT.setCellFactory(TextFieldTableCell.forTableColumn(stringConverterDouble));
+		columnSelledPrice.setCellFactory(TextFieldTableCell.forTableColumn(stringConverterDouble));
+		
+		CellDoubleEditEventHandler cellDoubleEditEventHandler = new CellDoubleEditEventHandler();
+		columnQNT.setOnEditCommit(cellDoubleEditEventHandler);
+		columnSelledPrice.setOnEditCommit(cellDoubleEditEventHandler);
 
 		tableViewProducts.setOnMousePressed(new MouseEventHandler());
 
@@ -199,6 +200,19 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 			panePayement.setVisible(true);
 			paneAddProduct.setVisible(false);
 			paneButtons.setVisible(false);
+			
+			date.setDisable(true);
+			comboBoxDepot.setDisable(true);
+			spinerHoures.setDisable(true);
+			spinerMinutes.setDisable(true);
+			txtClientCode.setEditable(false);
+			txtDiscount.setEditable(false);
+			tableViewProducts.setEditable(false);
+			
+			date.setStyle("-fx-opacity: 1 ;");
+			comboBoxDepot.setStyle("-fx-opacity: 1 ;");
+			spinerHoures.setStyle("-fx-opacity: 1 ;");
+			spinerMinutes.setStyle("-fx-opacity: 1 ;");
 
 			tableViewProducts.setRowFactory(null);
 		}
@@ -395,9 +409,11 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 				try {
 					Product product = AppDataBaseManager.shared.getProductByCode(txtProductCode.getText());
 
-					if (product != null) {
+					if (txtProductQnt.getText().equals("")) {
+						txtProductQnt.requestFocus();
+					}else if (product != null) {
 
-						int qntToAdd = Integer.parseInt(txtProductQnt.getText());
+						double qntToAdd = Double.parseDouble(txtProductQnt.getText());
 
 						int i = 0;
 
@@ -472,7 +488,7 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 					txtProductQnt.setText("");
 				} 
 			}else if (txt == txtProductQnt) {
-				txt.setText(stringsManager.getOnlyNumbers(txt.getText()));
+				txt.setText(stringsManager.getDoubleFormat(txt.getText()));
 			}else if (txt == txtDiscount) {
 				String onlyDouble = stringsManager.getDoubleFormat(newValue);
 
@@ -509,28 +525,26 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 
 	}
 
-	private class CellIntegerEditEventHandler implements EventHandler<CellEditEvent<ProductBill, Integer>>{
-
-		@Override
-		public void handle(CellEditEvent<ProductBill, Integer> event) {
-			if (event.getNewValue() == 0) {
-				productsData.remove(event.getTablePosition().getRow());
-			}else{
-				ProductBill productBill = productsData.get(event.getTablePosition().getRow());
-				productBill.setQnt(event.getNewValue());
-				tableViewProducts.refresh();
-			}
-		}
-
-	}
 
 	private class CellDoubleEditEventHandler implements EventHandler<CellEditEvent<ProductBill, Double>>{
 
 		@Override
 		public void handle(CellEditEvent<ProductBill, Double> event) {
-			ProductBill productBill = productsData.get(event.getTablePosition().getRow());
-			productBill.setPriceSelled(event.getNewValue());
-			tableViewProducts.refresh();
+			
+			if (event.getSource() == columnQNT) {
+				if (event.getNewValue() == 0) {
+					productsData.remove(event.getTablePosition().getRow());
+				}else{
+					ProductBill productBill = productsData.get(event.getTablePosition().getRow());
+					productBill.setQnt(event.getNewValue());
+					tableViewProducts.refresh();
+				}
+			}else if (event.getSource() == columnSelledPrice) {
+				ProductBill productBill = productsData.get(event.getTablePosition().getRow());
+				productBill.setPriceSelled(event.getNewValue());
+				tableViewProducts.refresh();
+			}
+			
 		}
 
 	}
@@ -552,6 +566,14 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 
 	}
 
+	private class DepotChangeListener implements ChangeListener<Depot> {
+		
+		@Override
+		public void changed(ObservableValue<? extends Depot> observable, Depot oldValue, Depot newValue) {
+			tableViewProducts.refresh();
+		}
+
+	}
 
 	private class TableViewRowFactory implements Callback<TableView<ProductBill>, TableRow<ProductBill>> {
 
@@ -566,7 +588,7 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 						setStyle("");
 					}else {
 						try {
-							int availableStock = AppDataBaseManager.shared.getProductsStock(item.getCode(), 
+							double availableStock = AppDataBaseManager.shared.getProductsStock(item.getCode(), 
 									comboBoxDepot.getValue().getCode());
 
 							if (availableStock >= item.getQnt()) {

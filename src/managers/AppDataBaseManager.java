@@ -99,7 +99,7 @@ public class AppDataBaseManager {
 				st.executeUpdate("CREATE TABLE Stock ( "
 						+ "code_depot INTEGER NOT NULL, "
 						+ "code_product VARCHAR_IGNORECASE(20) NOT NULL, "
-						+ "QNT INTEGER NOT NULL, "
+						+ "QNT DOUBLE NOT NULL, "
 						+ "PRIMARY KEY (code_depot, code_product), "
 						+ "CONSTRAINT fkStockProduct FOREIGN KEY (code_product) "
 						+ "REFERENCES Product (code) ON DELETE CASCADE ON UPDATE CASCADE, "
@@ -122,7 +122,7 @@ public class AppDataBaseManager {
 				st.executeUpdate("CREATE TABLE TransferStockProducts ( "
 						+ "code_TransferStock INTEGER NOT NULL, "
 						+ "code_product VARCHAR_IGNORECASE(20) NOT NULL, "
-						+ "QNT INTEGER NOT NULL, "
+						+ "QNT DOUBLE NOT NULL, "
 						+ "PRIMARY KEY (code_TransferStock, code_product), "
 						+ "CONSTRAINT fkTransferStockProduct FOREIGN KEY (code_product) "
 						+ "REFERENCES Product (code) ON DELETE CASCADE ON UPDATE CASCADE, "
@@ -169,7 +169,7 @@ public class AppDataBaseManager {
 				st.executeUpdate("CREATE TABLE BillProducts ( "
 						+ "code_bill VARCHAR_IGNORECASE(20) NOT NULL, "
 						+ "code_product VARCHAR_IGNORECASE(20) NOT NULL, "
-						+ "QNT INTEGER NOT NULL, "
+						+ "QNT DOUBLE NOT NULL, "
 						+ "price DOUBLE NOT NULL, "
 						+ "PRIMARY KEY (code_bill, code_product), "
 						+ "CONSTRAINT fkBillProduct FOREIGN KEY (code_product) "
@@ -312,10 +312,10 @@ public class AppDataBaseManager {
 		for (int i=0; i<billsProducts.size(); i++) {
 			ProductBill product = billsProducts.get(i);
 			psAddProductToBill.setString(2, product.getCode());
-			psAddProductToBill.setInt(3, product.getQnt());
+			psAddProductToBill.setDouble(3, product.getQnt());
 			psAddProductToBill.setDouble(4, product.getPriceSelled());
 			
-			psUpdateStock.setInt(1, product.getQnt());
+			psUpdateStock.setDouble(1, product.getQnt());
 			psUpdateStock.setInt(2, bill.getDepotCode());
 			psUpdateStock.setString(3, product.getCode());
 			
@@ -343,7 +343,7 @@ public class AppDataBaseManager {
 		while (rsBillProducts.next()) {
 			Product product = getProductByCode(rsBillProducts.getString(1));
 			product.setPrice(getProductPrice(product.getCode(), rsBillDetails.getTimestamp(2)));
-			products.add(new ProductBill(product, rsBillProducts.getDouble(3), rsBillProducts.getInt(2)));
+			products.add(new ProductBill(product, rsBillProducts.getDouble(3), rsBillProducts.getDouble(2)));
 		}
 		
 		return new Bill(billCode, rsBillDetails.getString(4), rsBillDetails.getInt(5), 
@@ -396,7 +396,7 @@ public class AppDataBaseManager {
 
 
 	//if don't want to search with constraint pass "" not null and for stockMax pass null
-	public ArrayList<String> getAllProductsCodes(String codeLike, String nameLike, Integer stockMax) throws SQLException{
+	public ArrayList<String> getAllProductsCodes(String codeLike, String nameLike, Double stockMax) throws SQLException{
 		ArrayList<String> allProductsCodes = new ArrayList<>();
 
 
@@ -413,7 +413,7 @@ public class AppDataBaseManager {
 		pst.setBoolean(4, stockMax != null);
 
 		if (stockMax != null) {
-			pst.setInt(5, stockMax);
+			pst.setDouble(5, stockMax);
 		}else{
 			pst.setInt(5, 0); // Will not execute, only to avoid SQLException -> Checked with  (stockMax != null = true in the SQL)
 		}
@@ -668,11 +668,11 @@ public class AppDataBaseManager {
 		for (int i=0; i<productsWithStocks.size(); i++) {
 			
 			pstInsertIntoTransferStockProducts.setString(2, productsWithStocks.get(i).getCode());
-			pstInsertIntoTransferStockProducts.setInt(3, productsWithStocks.get(i).getQnt());
+			pstInsertIntoTransferStockProducts.setDouble(3, productsWithStocks.get(i).getQnt());
 			
 			pstInsertIntoTransferStockProducts.executeUpdate();
 			
-			pstUpdateStock.setInt(1, productsWithStocks.get(i).getQnt());
+			pstUpdateStock.setDouble(1, productsWithStocks.get(i).getQnt());
 			pstUpdateStock.setInt(2, toDepotCode);
 			pstUpdateStock.setString(3, productsWithStocks.get(i).getCode());
 			
@@ -680,7 +680,7 @@ public class AppDataBaseManager {
 			
 			
 			if (fromDepotCode != 0) {
-				pstUpdateStock.setInt(1, -productsWithStocks.get(i).getQnt());
+				pstUpdateStock.setDouble(1, -productsWithStocks.get(i).getQnt());
 				pstUpdateStock.setInt(2, fromDepotCode);
 				pstUpdateStock.executeUpdate();
 			}
@@ -694,24 +694,24 @@ public class AppDataBaseManager {
 	}
 	
 
-	public Integer getProductsStock(String productCode) throws SQLException{
+	public Double getProductsStock(String productCode) throws SQLException{
 
 		ResultSet rs = st.executeQuery("SELECT SUM(QNT) FROM STOCK WHERE CODE_PRODUCT = '"+productCode+"' ;");
 
 		if (rs.next()) {
-			return rs.getInt(1);
+			return rs.getDouble(1);
 		}else{
 			return null;
 		}
 
 	}
 
-	public Integer getProductsStock(String productCode, int depotCode) throws SQLException{
+	public Double getProductsStock(String productCode, int depotCode) throws SQLException{
 		ResultSet rs = st.executeQuery("SELECT QNT FROM STOCK WHERE CODE_PRODUCT = '"+productCode+"' "
 				+ "and CODE_DEPOT = "+depotCode+" ;");
 
 		if (rs.next()) {
-			return rs.getInt(1);
+			return rs.getDouble(1);
 		}else{
 			return null;
 		}

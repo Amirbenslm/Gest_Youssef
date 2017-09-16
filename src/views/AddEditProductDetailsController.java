@@ -108,7 +108,7 @@ public class AddEditProductDetailsController implements Initializable {
 						ArrayList<DepotStock> depotsStocks = productDetailsController.getDepotsStocksEntredByUser();
 						
 						for (int i=0; i<depotsStocks.size();i++){
-							int qnt = depotsStocks.get(i).getQnt();
+							double qnt = depotsStocks.get(i).getQnt();
 							if (qnt != 0){
 								
 								ProductStock productStock = new ProductStock(product, qnt);
