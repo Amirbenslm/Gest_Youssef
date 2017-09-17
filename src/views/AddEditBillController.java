@@ -227,14 +227,13 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 		date.setValue(LocalDate.now());
 	}
 
-	public void showBillDetails(String billCode){
+	public void showBillDetails(Bill bill){
 		isAddingNewBill = false;
 		configureView();
 
 		try {
-			Bill bill = AppDataBaseManager.shared.getBillByCode(billCode);
 
-			lblBillNumber.setText(billCode);
+			lblBillNumber.setText(bill.getBillCode());
 
 			date.setValue(bill.getDate().toLocalDateTime().toLocalDate());
 			spinerHoures.getValueFactory().setValue(bill.getDate().toLocalDateTime().getHour());
@@ -254,7 +253,8 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 
 			// payementDetails
 
-			ArrayList<Payment> allPayments = AppDataBaseManager.shared.getAllPaymentForBillByBillCode(billCode);
+			ArrayList<Payment> allPayments = AppDataBaseManager.shared.
+					getAllPaymentForBillByBillCode(bill.getBillCode());
 			paymentsData.addAll(allPayments);
 			refreshPaymentsDetails();
 		} catch (SQLException e) {
@@ -350,7 +350,8 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 
 		try {
 			String billCode = AppDataBaseManager.shared.createNewBill(bill);
-			showBillDetails(billCode);
+			bill.setBillCode(billCode);
+			showBillDetails(bill);
 		} catch (SQLException e) {
 			AlertError alert = new AlertError("ERROR ERR0011", "SQL error code : "+e.getErrorCode(),e.getMessage());
 			alert.showAndWait();

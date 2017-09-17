@@ -2,7 +2,6 @@ package views;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -16,9 +15,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import models.Bill;
 import models.Depot;
 import models.Product;
-import models.ViewController;
 import models.ui.AddPaymentDelegate;
 import models.ui.ClientSearchPickedClientDelegate;
 import models.ui.ProductSearchPickedProductDelegate;
@@ -27,15 +26,14 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	static public RootViewController selfRef;
 
-
-	private ArrayList<ViewController> viewsTab = new ArrayList<>();
+	//private ArrayList<ViewController> viewsTab = new ArrayList<>();
 
 	@FXML Button btnDashboard;
 
 	@FXML Button btnClients;
 	@FXML Button btnAddClient;
-	@FXML Button btnFactures;
-	@FXML Button btnAddFacture;
+	@FXML Button btnBills;
+	@FXML Button btnAddBill;
 
 	@FXML Button btnArticles;
 	@FXML Button btnAddArticle;
@@ -59,8 +57,8 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 		btnClients.setOnAction(this);
 		btnAddClient.setOnAction(this);
-		btnFactures.setOnAction(this);
-		btnAddFacture.setOnAction(this);
+		btnBills.setOnAction(this);
+		btnAddBill.setOnAction(this);
 
 		btnArticles.setOnAction(this);
 		btnAddArticle.setOnAction(this);
@@ -115,11 +113,11 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			showAddNewClientView();
 		}
 
-		else if (event.getSource() == btnFactures) {
-			showBillDetailsView();
+		else if (event.getSource() == btnBills) {
+			showAllBillsView();
 		}
 
-		else if (event.getSource() == btnAddFacture) {
+		else if (event.getSource() == btnAddBill) {
 			showAddNewBillView();
 		}
 
@@ -173,22 +171,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	public void presentClientDetailsView(String clientCode){
 		showAddNewClientView();
 	}
-	
-	
-	private void showBillDetailsView(){
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/AddEditBill.fxml"));
-			Pane p = loader.load();
-			AddEditBillController controller = loader.getController();
-			controller.showBillDetails("0170900002");
-			showPaneInAlertMode("BLA", p, 1400, 750);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
+		
 	private void showAddNewBillView(){
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -202,6 +185,33 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 	}
 
+	public void presentBillDetailsView(Bill bill){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditBill.fxml"));
+			Pane p = loader.load();
+			AddEditBillController controller = loader.getController();
+			controller.showBillDetails(bill);
+			showPaneInAlertMode("BLA", p, 1400, 750);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void showAllBillsView(){
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AllBills.fxml"));
+			Pane p = loader.load();
+			showPaneInContainer(p);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 	
 	public void presentAddPaymentView(String forBillCode,double amountTotalToPay, double amountPayed, 
 			AddPaymentDelegate delegate){

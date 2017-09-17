@@ -12,7 +12,11 @@ public class StringConverterLocalDate extends StringConverter<LocalDate> {
 	@Override
 	public String toString(LocalDate localDate)
 	{
-		return dateTimeFormatter.format(localDate);
+		if (localDate != null) {
+			return dateTimeFormatter.format(localDate);	
+		}else{
+			return null;
+		}
 	}
 
 	@Override

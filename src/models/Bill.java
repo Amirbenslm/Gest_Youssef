@@ -25,6 +25,10 @@ public class Bill {
 	}
 
 
+	public void setBillCode(String billCode) {
+		this.billCode = billCode;
+	}
+
 	public String getBillCode() {
 		return billCode;
 	}
@@ -52,6 +56,21 @@ public class Bill {
 
 	public ArrayList<ProductBill> getProducts() {
 		return products;
+	}
+	
+	public double calculateTotal(){
+		double total = 0;
+		
+		for (int i=0;i<products.size();i++) {
+			total += products.get(i).getTotalPrice();
+		}
+		
+		return total;
+	}
+	
+	public double calculatTotalWithDiscount(){
+		double total = calculateTotal();
+		return total-(total*(discount/100));
 	}
 	
 }
