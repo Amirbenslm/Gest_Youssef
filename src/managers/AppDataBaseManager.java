@@ -25,6 +25,9 @@ public class AppDataBaseManager {
 
 	static private String PAYMENT_TYPE_CHECK = "CHECK";
 	static private String PAYMENT_TYPE_CASH = "CASH";
+	static private String PHONE_TYPE_PHONE = "PHONE";
+	static private String PHONE_TYPE_FAX = "FAX";
+
 
 	static public AppDataBaseManager shared = new AppDataBaseManager();
 
@@ -147,7 +150,7 @@ public class AppDataBaseManager {
 						+ "number VARCHAR_IGNORECASE(30) NOT NULL, "
 						+ "type VARCHAR_IGNORECASE(5) NOT NULL, "
 						+ "code_client VARCHAR_IGNORECASE(30) NOT NULL, "
-						+ "CHECK(type IN ('fax','phone')), "
+						+ "CHECK(type IN ('FAX','PHONE')), "
 						+ "PRIMARY KEY (number, type,code_client), "
 						+ "CONSTRAINT fkClientPhoneNumber FOREIGN KEY (code_client) "
 						+ "REFERENCES Client (CODE) ON DELETE CASCADE ON UPDATE CASCADE );");
@@ -211,6 +214,75 @@ public class AppDataBaseManager {
 
 	//Clients
 
+	public void createNewClient(Client client) throws SQLException{
+		PreparedStatement psInsertClinet = con.prepareStatement("INSERT INTO CLIENT (CODE, NAME, LASTNAME, ADRESSE) "
+				+ "VALUES (?, ?, ?, ?);");
+		
+		psInsertClinet.setString(1, client.getCode());
+		psInsertClinet.setString(2, client.getName());
+		psInsertClinet.setString(3, client.getLastName());
+		psInsertClinet.setString(4, client.getAddress());
+		
+		psInsertClinet.executeUpdate();
+		
+		PreparedStatement psInsertPhoneNumber = con.prepareStatement("INSERT INTO PHONENUMBER "
+				+ "(NUMBER, TYPE, CODE_CLIENT) VALUES (?, ?, ?);");
+		psInsertPhoneNumber.setString(3, client.getCode());
+		
+		psInsertPhoneNumber.setString(2, PHONE_TYPE_PHONE);
+		for (int i=0 ; i<client.getPhonesNumbers().size(); i++) {
+			psInsertPhoneNumber.setString(1, client.getPhonesNumbers().get(i));
+			psInsertPhoneNumber.executeUpdate();
+		}
+		
+		psInsertPhoneNumber.setString(2, PHONE_TYPE_FAX);
+		for (int i=0 ; i<client.getFaxNumbers().size(); i++) {
+			psInsertPhoneNumber.setString(1, client.getFaxNumbers().get(i));
+			psInsertPhoneNumber.executeUpdate();
+		}
+		
+	}
+	
+	public void updateClientCode(String clientCode, Client client) throws SQLException{
+		PreparedStatement psUpdateClinet = con.prepareStatement("UPDATE CLIENT "
+				+ "SET CODE = ?, NAME = ?, LASTNAME = ?, ADRESSE = ? "
+				+ "WHERE CODE = ?;");
+		
+		psUpdateClinet.setString(1, client.getCode());
+		psUpdateClinet.setString(2, client.getName());
+		psUpdateClinet.setString(3, client.getLastName());
+		psUpdateClinet.setString(4, client.getAddress());
+		psUpdateClinet.setString(5, clientCode);
+		
+		psUpdateClinet.executeUpdate();
+		
+		
+		st.executeUpdate("DELETE FROM PHONENUMBER WHERE CODE_CLIENT = '"+client.getCode()+"';");
+		
+		PreparedStatement psInsertPhoneNumber = con.prepareStatement("INSERT INTO PHONENUMBER "
+				+ "(NUMBER, TYPE, CODE_CLIENT) VALUES (?, ?, ?);");
+		psInsertPhoneNumber.setString(3, client.getCode());
+		
+		psInsertPhoneNumber.setString(2, PHONE_TYPE_PHONE);
+		for (int i=0 ; i<client.getPhonesNumbers().size(); i++) {
+			psInsertPhoneNumber.setString(1, client.getPhonesNumbers().get(i));
+			psInsertPhoneNumber.executeUpdate();
+		}
+		
+		psInsertPhoneNumber.setString(2, PHONE_TYPE_FAX);
+		for (int i=0 ; i<client.getFaxNumbers().size(); i++) {
+			psInsertPhoneNumber.setString(1, client.getFaxNumbers().get(i));
+			psInsertPhoneNumber.executeUpdate();
+		}
+		
+	}
+	
+	public boolean isClientCodeExist(String code) throws SQLException{
+		PreparedStatement pst = con.prepareStatement("SELECT CODE FROM CLIENT where CODE = ? ;");
+		pst.setString(1, code);
+		return pst.executeQuery().next();
+	}
+
 
 	//if don't want to search with constraint pass "" not null
 	public ArrayList<String> getAllClientsCodes(String codeLike, String nameLike, String lastNameLike
@@ -253,6 +325,42 @@ public class AppDataBaseManager {
 		return client;
 	}
 
+	
+	public ArrayList<String> getClientsPhonesNumbersByClientCode(String clientCode) throws SQLException{
+		ArrayList<String> phonesNumbers = new ArrayList<>();
+		
+		PreparedStatement ps = con.prepareStatement("SELECT NUMBER FROM PHONENUMBER "
+				+ "WHERE TYPE = ? and CODE_CLIENT = ? ;");
+		
+		ps.setString(1, PHONE_TYPE_PHONE);
+		ps.setString(2, clientCode);
+		
+		ResultSet rs = ps.executeQuery();
+		
+		while (rs.next()) {
+			phonesNumbers.add(rs.getString(1));
+		}
+		
+		return phonesNumbers;
+	}
+	
+	public ArrayList<String> getClientsFaxNumbersByClientCode(String clientCode) throws SQLException{
+		ArrayList<String> faxNumbers = new ArrayList<>();
+		
+		PreparedStatement ps = con.prepareStatement("SELECT NUMBER FROM PHONENUMBER "
+				+ "WHERE TYPE = ? and CODE_CLIENT = ? ;");
+		
+		ps.setString(1, PHONE_TYPE_FAX);
+		ps.setString(2, clientCode);
+		
+		ResultSet rs = ps.executeQuery();
+		
+		while (rs.next()) {
+			faxNumbers.add(rs.getString(1));
+		}
+		
+		return faxNumbers;
+	}
 
 
 	//Bills
@@ -352,24 +460,26 @@ public class AppDataBaseManager {
 	}
 
 	//if don't want to search with constraint pass "" not null and for date pass null
-	public ArrayList<String> getAllBillsCodes(String codeLike, LocalDate date) throws SQLException{
+	public ArrayList<String> getAllBillsCodes(String billCodeLike, LocalDate date, String clientCodeLike) 
+			throws SQLException{
 		ArrayList<String> allBillsCodes = new ArrayList<>();
 
 		PreparedStatement pst = con.prepareStatement("SELECT CODE FROM BILL "
-				+ "WHERE Code like ? and "
+				+ "WHERE Code like ? and CODE_CLIENT like ? and "
 				+ "( "
 				+ "(? = false) or "
 				+ "((? = true) and (CAST(DATE AS DATE) = ?)) "
 				+ ") ;");
 
-		pst.setString(1, codeLike+"%");
-		pst.setBoolean(2, date != null);
+		pst.setString(1, billCodeLike+"%");
+		pst.setString(2, "%"+clientCodeLike+"%");
 		pst.setBoolean(3, date != null);
+		pst.setBoolean(4, date != null);
 
 		if (date != null) {
-			pst.setDate(4, Date.valueOf(date));
+			pst.setDate(5, Date.valueOf(date));
 		}else{
-			pst.setDate(4, new Date(System.currentTimeMillis()));// Will not execute, only to avoid SQLException -> Checked with  (date != null = true in the SQL request)
+			pst.setDate(5, new Date(System.currentTimeMillis()));// Will not execute, only to avoid SQLException -> Checked with  (date != null = true in the SQL request)
 		}
 
 		ResultSet rs = pst.executeQuery();
@@ -378,6 +488,18 @@ public class AppDataBaseManager {
 			allBillsCodes.add(rs.getString(1));
 		}
 
+		return allBillsCodes;
+	}
+
+
+	public ArrayList<String> getAllBillsCodesByClientCode(String clientCode) throws SQLException{
+		ArrayList<String> allBillsCodes = new ArrayList<>();
+
+		ResultSet rs = st.executeQuery("SELECT CODE FROM BILL WHERE CODE_CLIENT = '"
+				+clientCode+"';");
+		while (rs.next()) {
+			allBillsCodes.add(rs.getString(1));
+		}
 		return allBillsCodes;
 	}
 
@@ -428,6 +550,46 @@ public class AppDataBaseManager {
 				+billCode+"' ;");
 		rs.next();
 		return rs.getDouble(1);
+	}
+	
+	
+	public double getClientAllBillsTotalsByClientCode(String clientCode) throws SQLException{
+		double allBillsTotals = 0;
+		
+		ArrayList<String> allBillsCode = getAllBillsCodesByClientCode(clientCode);
+		
+		for (int i=0; i<allBillsCode.size(); i++) {
+			Bill bill = getBillByCode(allBillsCode.get(i));
+			allBillsTotals += bill.calculatTotalWithDiscount();
+		}
+
+		return allBillsTotals;
+	}
+
+	public double getClientAllBillsGainedAmmountsByClientCode(String clientCode) throws SQLException{
+		double totalGained = 0;
+		
+		ArrayList<String> allBillsCode = getAllBillsCodesByClientCode(clientCode);
+		
+		for (int i=0; i<allBillsCode.size(); i++) {
+			Bill bill = getBillByCode(allBillsCode.get(i));
+			totalGained += bill.calculateGainedAmount();
+		}
+
+		return totalGained;
+	}
+
+	public double getClientAllBillsNotPayedAmmountsByClientCode(String clientCode) throws SQLException{
+		double totalNotPayed = 0;
+		
+		ArrayList<String> allBillsCode = getAllBillsCodesByClientCode(clientCode);
+		
+		for (int i=0; i<allBillsCode.size(); i++) {
+			Bill bill = getBillByCode(allBillsCode.get(i));
+			totalNotPayed += bill.calculateAmountNotPayed();
+		}
+
+		return totalNotPayed;
 	}
 
 	//Products
@@ -560,7 +722,7 @@ public class AppDataBaseManager {
 		if (rs.next()) {
 			productPrice = new ProductPrice(rs.getDouble(1), rs.getDouble(2), rs.getDouble(3), rs.getDouble(4));
 		}
-
+		
 		return productPrice;
 	}
 

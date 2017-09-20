@@ -158,7 +158,10 @@
                </children>
             </GridPane>
             <Button fx:id="btnAddPayment" layoutX="92.0" layoutY="139.0" mnemonicParsing="false" text="Ajouter paiement" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="140.0" />
-            <Label layoutX="323.0" layoutY="22.0" text="HISTORIQUE DE PAIEMENT" AnchorPane.leftAnchor="330.0" AnchorPane.topAnchor="30.0" />
+            <Label layoutX="323.0" layoutY="22.0" text="HISTORIQUE DE PAIEMENT" AnchorPane.leftAnchor="330.0" AnchorPane.topAnchor="30.0">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
             <TableView fx:id="tableViewPayments" layoutX="334.0" layoutY="46.0" maxWidth="440.0" minWidth="440.0" prefHeight="115.0" prefWidth="440.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="340.0" AnchorPane.topAnchor="55.0">
               <columns>
                 <TableColumn fx:id="columnPaymentDate" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" text="Date" />

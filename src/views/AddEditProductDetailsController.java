@@ -23,7 +23,6 @@ import models.Product;
 import models.ProductPrice;
 import models.ProductStock;
 import models.ui.AlertError;
-import models.ui.AlertWarning;
 
 public class AddEditProductDetailsController implements Initializable {
 
@@ -33,7 +32,7 @@ public class AddEditProductDetailsController implements Initializable {
 	@FXML FlowPane containerFP;
 
 	Pane paneProductDetails;
-	ProductDetailsController productDetailsController;
+	private ProductDetailsController productDetailsController;
 
 	
 	@Override
@@ -94,7 +93,7 @@ public class AddEditProductDetailsController implements Initializable {
 
 				try {
 					if (AppDataBaseManager.shared.isProductCodeExist(productCode)) {
-						AlertWarning alert = new AlertWarning("Nom existe déjà", 
+						AlertError alert = new AlertError("Nom existe déjà", 
 								"Le nom de l'article Blabla' "+productCode+" ' existe déjà !", 
 								"Réessayer avec un autre nom");
 						alert.showAndWait();

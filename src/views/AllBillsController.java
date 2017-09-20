@@ -58,6 +58,8 @@ public class AllBillsController implements Initializable{
 	
 	private StringsManager stringsManager = new StringsManager();
 	
+	private String showOnlyForClientCode = ""; // if == "" it will show for all clients
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		
@@ -107,7 +109,6 @@ public class AllBillsController implements Initializable{
 		ActionEventHandler actionEventHandler = new ActionEventHandler();
 		btnSearch.setOnAction(actionEventHandler);
 		txtBillsNumber.setOnAction(actionEventHandler);
-		//datePicker.setOnAction(actionEventHandler);
 		
 		TextFieldChangeListener textFieldChangeListener = new TextFieldChangeListener();
 		txtBillsNumber.textProperty().addListener(textFieldChangeListener);
@@ -125,13 +126,18 @@ public class AllBillsController implements Initializable{
 		});
 	}
 	
+	
+	public void forceSearchToShowOnlyForClientCode(String clientCode){
+		showOnlyForClientCode = clientCode;
+	}
+	
 	public void refrechTableViewData(){
 
 		billsData.clear();
 
 		try {
 			ArrayList<String> billsCodes = AppDataBaseManager.shared.getAllBillsCodes(txtBillsNumber.getText(), 
-					datePicker.getValue());
+					datePicker.getValue(), showOnlyForClientCode);
 
 			for (int i=0;i<billsCodes.size();i++){
 				Bill bill = AppDataBaseManager.shared.getBillByCode(billsCodes.get(i));
@@ -140,8 +146,8 @@ public class AllBillsController implements Initializable{
 
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			AlertError alert = new AlertError("ERROR ERR0016", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();
 		}
 	}
 	

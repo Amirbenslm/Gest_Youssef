@@ -16,17 +16,17 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Bill;
+import models.Client;
 import models.Depot;
 import models.Product;
 import models.ui.AddPaymentDelegate;
+import models.ui.ClientDetailsChangedDelegate;
 import models.ui.ClientSearchPickedClientDelegate;
 import models.ui.ProductSearchPickedProductDelegate;
 
-public class RootViewController implements Initializable, EventHandler<ActionEvent>{
+public class RootViewController implements Initializable, EventHandler<ActionEvent> {
 
 	static public RootViewController selfRef;
-
-	//private ArrayList<ViewController> viewsTab = new ArrayList<>();
 
 	@FXML Button btnDashboard;
 
@@ -106,7 +106,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 		else if (event.getSource() == btnClients) {
-			System.out.println("hhh");
+			showAllClientsView();
 		}
 
 		else if (event.getSource() == btnAddClient) {
@@ -158,7 +158,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	private void showAddNewClientView(){
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/AddClient.fxml"));
+			loader.setLocation(getClass().getResource("/views/AddEditClient.fxml"));
 			Pane p = loader.load();
 
 			showPaneInAlertMode("Ajouter client", p, 660, 350);
@@ -168,10 +168,51 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 	}
 	
-	public void presentClientDetailsView(String clientCode){
-		showAddNewClientView();
+	public void showEditClientView(Client client, ClientDetailsChangedDelegate delegate){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditClient.fxml"));
+			Pane p = loader.load();
+			AddEditClientController controller = loader.getController();
+			controller.editModeForClient(client);
+			controller.delegate = delegate;
+			showPaneInAlertMode("Ajouter client", p, 660, 350);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void presentClientFullDetailsView(String clientCode){
+		
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/FullClientDetails.fxml"));
+			Pane p = loader.load();
+			FullClientDetailsController controller = loader.getController();
+			controller.showClientDetails(clientCode);
+			showPaneInAlertMode("Client détails", p, 730, 630);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 		
+	private void showAllClientsView(){
+
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AllClients.fxml"));
+			Pane p = loader.load();
+			showPaneInContainer(p);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	
 	private void showAddNewBillView(){
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -386,5 +427,6 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			String forProductCode, String forProductName){
 		presentProductSearchView(null, delegate, forProductCode, forProductName);
 	}
+
 
 }
