@@ -162,7 +162,7 @@
                            </children>
                         </FlowPane>
                         <Separator layoutX="526.0" layoutY="-23.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="520.0" AnchorPane.topAnchor="0.0" />
-                        <Button fx:id="btnInventaires" contentDisplay="TOP" layoutX="534.0" layoutY="17.0" mnemonicParsing="false" prefHeight="80.0" prefWidth="90.0" text="Inventaires" textAlignment="CENTER" AnchorPane.leftAnchor="530.0" AnchorPane.topAnchor="15.0">
+                        <Button fx:id="btnInventaires" contentDisplay="TOP" layoutX="534.0" layoutY="17.0" mnemonicParsing="false" prefHeight="80.0" prefWidth="90.0" text="Inventaires" textAlignment="CENTER" visible="false" AnchorPane.leftAnchor="530.0" AnchorPane.topAnchor="15.0">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -171,7 +171,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="btnAddInventaire" contentDisplay="TOP" layoutX="636.0" layoutY="17.0" mnemonicParsing="false" prefHeight="80.0" prefWidth="90.0" text="Nouv.&#10;inventaire" textAlignment="CENTER" AnchorPane.leftAnchor="625.0" AnchorPane.topAnchor="15.0">
+                        <Button fx:id="btnAddInventaire" contentDisplay="TOP" layoutX="636.0" layoutY="17.0" mnemonicParsing="false" prefHeight="80.0" prefWidth="90.0" text="Nouv.&#10;inventaire" textAlignment="CENTER" visible="false" AnchorPane.leftAnchor="625.0" AnchorPane.topAnchor="15.0">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -180,10 +180,10 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Separator layoutX="738.0" layoutY="-36.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="720.0" AnchorPane.topAnchor="0.0" />
+                        <Separator layoutX="738.0" layoutY="-36.0" orientation="VERTICAL" prefHeight="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="720.0" AnchorPane.topAnchor="0.0" />
                         <FlowPane alignment="CENTER" layoutX="548.0" layoutY="105.0" prefWidth="185.0" AnchorPane.leftAnchor="530.0" AnchorPane.topAnchor="105.0">
                            <children>
-                              <Label text="Gestion des inventaires" textAlignment="CENTER" />
+                              <Label text="Gestion des inventaires" textAlignment="CENTER" visible="false" />
                            </children>
                         </FlowPane>
                      </children>

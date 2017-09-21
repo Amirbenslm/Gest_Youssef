@@ -69,8 +69,12 @@ public class AddEditProductDetailsController implements Initializable {
 	}
 	
 	public void loadProductDetails(Product product){
-		productDetailsController.changeEditsStats(false);
 		productDetailsController.loadProductDetails(product);
+	}
+	
+	public void forceSetEditMode(){
+		int x;
+		//productDetailsController.changeEditsStats(enabled);
 	}
 
 	private void closeStage(){
@@ -86,8 +90,10 @@ public class AddEditProductDetailsController implements Initializable {
 				String productCode = productDetailsController.txtCode.getText();
 				String productTitle = productDetailsController.txtLibelle.getText();
 				double productPrixDachatTTC = Double.parseDouble(productDetailsController.txtPrixDachatTTC.getText());
-				double productTVA = Double.parseDouble(productDetailsController.txtTVA.getText());
-				double productPrixDeVentHT = Double.parseDouble(productDetailsController.txtPrixDeVentHT.getText());
+				//double productTVA = Double.parseDouble(productDetailsController.txtTVA.getText());
+				double productTVA = 0;
+				//double productPrixDeVentHT = Double.parseDouble(productDetailsController.txtPrixDeVentHT.getText());
+				double productPrixDeVentHT = 0;
 				double productPrixDeVentTTC = Double.parseDouble(productDetailsController.txtPrixDeVentTTC.getText());
 
 
@@ -138,8 +144,8 @@ public class AddEditProductDetailsController implements Initializable {
 		if ( (productDetailsController.txtCode.getText().equals("")) || 
 				(productDetailsController.txtLibelle.getText().equals("")) ||
 				(productDetailsController.txtPrixDachatTTC.getText().equals("")) ||
-				(productDetailsController.txtTVA.getText().equals("")) ||
-				(productDetailsController.txtPrixDeVentHT.getText().equals("")) ||
+				//(productDetailsController.txtTVA.getText().equals("")) ||
+				//(productDetailsController.txtPrixDeVentHT.getText().equals("")) ||
 				(productDetailsController.txtPrixDeVentTTC.getText().equals("")) ){
 			btnSave.setDisable(true);
 		}else{

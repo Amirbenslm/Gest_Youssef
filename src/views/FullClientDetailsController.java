@@ -57,24 +57,7 @@ public class FullClientDetailsController implements Initializable, ClientDetails
 	private void loadClientInformations(String clientCode){
 		allBillsController.forceSearchToShowOnlyForClientCode(clientCode);
 		
-		try {
-			Client client = AppDataBaseManager.shared.getClientByCode(clientCode);
-			this.client = client;
-			client.setPhonesNumbers(AppDataBaseManager.shared.getClientsPhonesNumbersByClientCode(clientCode));
-			client.setFaxNumbers(AppDataBaseManager.shared.getClientsFaxNumbersByClientCode(clientCode));
-			
-			clientDetailsController.txtCode.setText(client.getCode());
-			clientDetailsController.txtName.setText(client.getName());
-			clientDetailsController.txtLastName.setText(client.getLastName());
-			clientDetailsController.txtAdress.setText(client.getAddress());
-
-			clientDetailsController.phonesNumbersData.setAll(client.getPhonesNumbers());
-			clientDetailsController.faxNumbersData.setAll(client.getFaxNumbers());
-
-		} catch (SQLException e) {
-			AlertError alert = new AlertError("ERROR ERR0027", "SQL error code : "+e.getErrorCode(),e.getMessage());
-			alert.showAndWait();
-		}
+		this.client = clientDetailsController.setClientDetails(clientCode);
 	}
 
 	private void loadClientPaymentInformations(String clientCode){
@@ -136,12 +119,7 @@ public class FullClientDetailsController implements Initializable, ClientDetails
 			clientDetailsController = loader.getController();
 			containerFPForClientDetails.getChildren().add(0, clientDetailsPane);
 
-			clientDetailsController.txtCode.setEditable(false);
-			clientDetailsController.txtName.setEditable(false);
-			clientDetailsController.txtLastName.setEditable(false);
-			clientDetailsController.txtAdress.setEditable(false);
-			clientDetailsController.listViewPhones.setEditable(false);
-			clientDetailsController.listViewFaxes.setEditable(false);
+			clientDetailsController.changeEditsStats(false);
 		} catch (IOException e) {
 			AlertError alert = new AlertError("ERROR ERR0025", "Fatal Error", e.getMessage());
 			alert.showAndWait();

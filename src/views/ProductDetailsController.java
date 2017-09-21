@@ -113,14 +113,13 @@ public class ProductDetailsController implements Initializable{
 	}
 
 	public void changeEditsStats(boolean enabled){
-
-		txtCode.setDisable(!enabled);
-		txtLibelle.setDisable(!enabled);
-		txtPrixDachatTTC.setDisable(!enabled);
-		txtTVA.setDisable(!enabled);
-		txtPrixDeVentHT.setDisable(!enabled);
-		txtPrixDeVentTTC.setDisable(!enabled);
-		tableViewDepots.setDisable(!enabled);
+		txtCode.setEditable(enabled);
+		txtLibelle.setEditable(enabled);
+		txtPrixDachatTTC.setEditable(enabled);
+		txtTVA.setEditable(enabled);
+		txtPrixDeVentHT.setEditable(enabled);
+		txtPrixDeVentTTC.setEditable(enabled);
+		tableViewDepots.setEditable(enabled);
 	}
 
 

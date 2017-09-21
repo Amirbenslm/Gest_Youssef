@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -188,6 +189,14 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 		tableViewPayments.setItems(paymentsData);
 
 		configureView();
+		
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				txtClientCode.requestFocus();
+			}
+		});
+		
 	}
 
 	private void configureView(){
@@ -540,10 +549,12 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 					productBill.setQnt(event.getNewValue());
 					tableViewProducts.refresh();
 				}
+				refreshBillTotal();
 			}else if (event.getSource() == columnSelledPrice) {
 				ProductBill productBill = productsData.get(event.getTablePosition().getRow());
 				productBill.setPriceSelled(event.getNewValue());
 				tableViewProducts.refresh();
+				refreshBillTotal();
 			}
 			
 		}

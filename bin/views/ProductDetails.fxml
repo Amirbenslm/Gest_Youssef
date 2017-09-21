@@ -18,9 +18,9 @@
       <Label layoutX="33.0" layoutY="125.0" text="     Prix d'achat TTC : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="125.0" />
       <TextField fx:id="txtPrixDachatTTC" layoutX="159.0" layoutY="120.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="120.0" />
       <Label layoutX="39.0" layoutY="154.0" text="     TVA : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="165.0" />
-      <TextField fx:id="txtTVA" layoutX="207.0" layoutY="213.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="160.0" />
+      <TextField fx:id="txtTVA" disable="true" layoutX="207.0" layoutY="213.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="160.0" />
       <Label layoutX="24.0" layoutY="183.0" text="     Prix de vente HT : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="205.0" />
-      <TextField fx:id="txtPrixDeVentHT" layoutX="197.0" layoutY="258.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="200.0" />
+      <TextField fx:id="txtPrixDeVentHT" disable="true" layoutX="197.0" layoutY="258.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="200.0" />
       <Label layoutX="24.0" layoutY="250.0" text="     Prix de vente TTC : " AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="245.0" />
       <TextField fx:id="txtPrixDeVentTTC" layoutX="165.0" layoutY="240.0" prefWidth="220.0" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="240.0" />
       <TableView fx:id="tableViewDepots" editable="true" layoutX="406.0" layoutY="13.0" prefHeight="258.0" prefWidth="280.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">

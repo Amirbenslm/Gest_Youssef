@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -155,6 +156,9 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
+	
+	//Clients
+	
 	private void showAddNewClientView(){
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -177,6 +181,29 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			controller.editModeForClient(client);
 			controller.delegate = delegate;
 			showPaneInAlertMode("Ajouter client", p, 660, 350);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void presentClientDetailsView(String clientCode){
+		
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/ClientDetails.fxml"));
+			Pane p = loader.load();
+			ClientDetailsController controller = loader.getController();
+			controller.setClientDetails(clientCode);
+			controller.changeEditsStats(false);
+			showPaneInAlertMode("Client détails", p, 660, 280);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					p.requestFocus();
+				}
+			});//to remove focus from txtCode
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -212,6 +239,28 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	}
 	
+	//Enter "" empty string in search constraint to disable the associated constraint
+	public void presentClientSearchView(String forClientCode, ClientSearchPickedClientDelegate delegate){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/ClientSearch.fxml"));
+			Pane p = loader.load();
+			ClientSearchController clientSearchController = loader.getController();
+			clientSearchController.delegate = delegate;
+			
+			if (! forClientCode.equals("") ){
+				clientSearchController.forceSearch(forClientCode);
+			}
+			
+			showPaneInAlertMode("BLA", p, 1135, 500);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	//Bills
 	
 	private void showAddNewBillView(){
 		try {
@@ -253,6 +302,11 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
+
+	
+	//Payments
+	
+	
 	
 	public void presentAddPaymentView(String forBillCode,double amountTotalToPay, double amountPayed, 
 			AddPaymentDelegate delegate){
@@ -272,6 +326,8 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 		
 	}
+	
+	//Products
 	
 	private void showAllProductView(){
 
@@ -301,7 +357,87 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
+	
 
+	public void presentProductDetailsView(Product product){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/ProductDetails.fxml"));
+			Pane p = loader.load();
+			ProductDetailsController productDetailsController = loader.getController();
+			
+			productDetailsController.loadProductDetails(product);
+			productDetailsController.changeEditsStats(false);
+			
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					p.requestFocus();
+				}
+			});//to remove focus from txtCode
+			
+			showPaneInAlertMode("BLA", p, 750, 300);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void presentProductFullDetailsView(Product product){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/ProductDetails.fxml"));
+			Pane p = loader.load();
+			ProductDetailsController productDetailsController = loader.getController();
+			
+			productDetailsController.loadProductDetails(product);
+			productDetailsController.changeEditsStats(false);
+			
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					p.requestFocus();
+				}
+			});//to remove focus from txtCode
+			
+			showPaneInAlertMode("BLA", p, 750, 300);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+
+	//Enter "" empty string in search constraint to disable the associated constraint
+	public void presentProductSearchView(Depot forDepot, ProductSearchPickedProductDelegate delegate, 
+			String forProductCode, String forProductName){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/ProductSearch.fxml"));
+			Pane p = loader.load();
+			ProductSearchController productSearchController = loader.getController();
+			productSearchController.delegate = delegate;
+			if (forDepot != null) {
+				productSearchController.configureDepot(forDepot);
+			}
+			if (! forProductCode.equals("") || ! forProductName.equals("")){
+				productSearchController.forceSearch(forProductCode, forProductName);
+			}
+			
+			showPaneInAlertMode("BLA", p, 850, 400);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void presentProductSearchView(ProductSearchPickedProductDelegate delegate, 
+			String forProductCode, String forProductName){
+		presentProductSearchView(null, delegate, forProductCode, forProductName);
+	}
+
+	//Depots
+	
 	private void showAddNewDepotView() {
 
 		try {
@@ -329,7 +465,12 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 		}
 
 	}
+	
 
+	
+	//Stocks
+	
+	
 	private void showStockInputView() {
 
 		try {
@@ -361,72 +502,6 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	}
 
-
-	public void presentProductDetailsView(Product product){
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/AddEditProductDetails.fxml"));
-			Pane p = loader.load();
-			AddEditProductDetailsController addEditProductDetailsController = loader.getController();
-			
-			addEditProductDetailsController.loadProductDetails(product);
-			
-			showPaneInAlertMode("BLA", p, 850, 400);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	//Enter "" empty string in search constraint to disable the associated constraint
-	public void presentClientSearchView(String forClientCode, ClientSearchPickedClientDelegate delegate){
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/ClientSearch.fxml"));
-			Pane p = loader.load();
-			ClientSearchController clientSearchController = loader.getController();
-			clientSearchController.delegate = delegate;
-			
-			if (! forClientCode.equals("") ){
-				clientSearchController.forceSearch(forClientCode);
-			}
-			
-			showPaneInAlertMode("BLA", p, 1135, 500);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
-
-	//Enter "" empty string in search constraint to disable the associated constraint
-	public void presentProductSearchView(Depot forDepot, ProductSearchPickedProductDelegate delegate, 
-			String forProductCode, String forProductName){
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/ProductSearch.fxml"));
-			Pane p = loader.load();
-			ProductSearchController productSearchController = loader.getController();
-			productSearchController.delegate = delegate;
-			if (forDepot != null) {
-				productSearchController.configureDepot(forDepot);
-			}
-			if (! forProductCode.equals("") || ! forProductName.equals("")){
-				productSearchController.forceSearch(forProductCode, forProductName);
-			}
-			
-			showPaneInAlertMode("BLA", p, 850, 400);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void presentProductSearchView(ProductSearchPickedProductDelegate delegate, 
-			String forProductCode, String forProductName){
-		presentProductSearchView(null, delegate, forProductCode, forProductName);
-	}
 
 
 }

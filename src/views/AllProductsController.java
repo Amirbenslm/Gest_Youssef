@@ -7,6 +7,8 @@ import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -23,9 +26,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 import managers.AppDataBaseManager;
+import managers.StringsManager;
 import models.Product;
 import models.ProductPrice;
 import models.ProductStock;
+import models.ui.AlertError;
 
 public class AllProductsController implements Initializable{
 
@@ -36,53 +41,88 @@ public class AllProductsController implements Initializable{
 
 	@FXML Button btnSearch;
 
+	@FXML CheckBox checkBoxShowMoreDetails;
 
 	@FXML TableView<ProductStock> tableViewProductsStocks;
 	@FXML TableColumn<ProductStock, String> columnCode;
 	@FXML TableColumn<ProductStock, String> columnName;
-	@FXML TableColumn<ProductStock, Double> columnTVA;
-	@FXML TableColumn<ProductStock, Double> columnPrixDeVentHT;
+	@FXML TableColumn<ProductStock, Double> columnPrixDAachatTTC;
 	@FXML TableColumn<ProductStock, Double> columnPrixDeVentTTC;
 	@FXML TableColumn<ProductStock, Integer> columnStock;
+	@FXML TableColumn<ProductStock, Double> columnQntSelled;
+	@FXML TableColumn<ProductStock, Double> columnTotalGain;
 
 
 	private ObservableList<ProductStock> productsStockData = FXCollections.observableArrayList();
+	
+	private boolean showPlusDetailsInTableView = false;
+	private StringsManager stringsManager = new StringsManager();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		refrechColumnsPlusDetailsViews();
 
 		columnCode.setCellValueFactory(new PropertyValueFactory<>("Code"));
 		columnName.setCellValueFactory(new PropertyValueFactory<>("Name"));
 		columnStock.setCellValueFactory(new PropertyValueFactory<>("Qnt"));
-		columnTVA.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ProductStock,Double>, ObservableValue<Double>>() {
-
+		columnPrixDAachatTTC.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ProductStock,Double>, ObservableValue<Double>>() {
 			@Override
 			public ObservableValue<Double> call(CellDataFeatures<ProductStock, Double> param) {
-				return new SimpleDoubleProperty(param.getValue().getPrice().getTva()).asObject();
-			}
-		});
-		columnPrixDeVentHT.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ProductStock,Double>, ObservableValue<Double>>() {
-
-			@Override
-			public ObservableValue<Double> call(CellDataFeatures<ProductStock, Double> param) {
-				return new SimpleDoubleProperty(param.getValue().getPrice().getPrixVenteHT()).asObject();
+				return new SimpleDoubleProperty(param.getValue().getPrice().getPrixAchatTTC()).asObject();
 			}
 		});
 		columnPrixDeVentTTC.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ProductStock,Double>, ObservableValue<Double>>() {
-
 			@Override
 			public ObservableValue<Double> call(CellDataFeatures<ProductStock, Double> param) {
 				return new SimpleDoubleProperty(param.getValue().getPrice().getPrixVenteTTC()).asObject();
 			}
 		});
+		columnQntSelled.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ProductStock,Double>, ObservableValue<Double>>() {
+			@Override
+			public ObservableValue<Double> call(CellDataFeatures<ProductStock, Double> param) {
+				if (!showPlusDetailsInTableView) {
+					return null;
+				}
+				try {
+					double totalQntSelled = AppDataBaseManager.shared
+							.getProductTotalQntSelledByProductCode(param.getValue().getCode());
+					return new SimpleDoubleProperty(totalQntSelled).asObject();
+				} catch (SQLException e) {
+					AlertError alert = new AlertError("ERROR ERR0030", "SQL error code : "+e.getErrorCode(),e.getMessage());
+					alert.showAndWait();
+					return null;
+				}
+			}
+		});
+		columnTotalGain.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ProductStock,Double>, ObservableValue<Double>>() {
+			@Override
+			public ObservableValue<Double> call(CellDataFeatures<ProductStock, Double> param) {
+				if (!showPlusDetailsInTableView) {
+					return null;
+				}
+				try {
+					double totalGained = AppDataBaseManager.shared
+							.getProductTotalGainedAmmountsByProductCode(param.getValue().getCode());
+					return new SimpleDoubleProperty(totalGained).asObject();
+				} catch (SQLException e) {
+					AlertError alert = new AlertError("ERROR ERR0030", "SQL error code : "+e.getErrorCode(),e.getMessage());
+					alert.showAndWait();
+					return null;
+				}
+			}
+		});
 
 		ActionEventHandler actionEventHandler = new ActionEventHandler();
-		
-		
 		btnSearch.setOnAction(actionEventHandler);
 		txtCode.setOnAction(actionEventHandler);
 		txtName.setOnAction(actionEventHandler);
 		txtStockLessThan.setOnAction(actionEventHandler);
+		checkBoxShowMoreDetails.setOnAction(actionEventHandler);
+		
+		TextFieldChangeListener textFieldChangeListener = new TextFieldChangeListener();
+		txtCode.textProperty().addListener(textFieldChangeListener);
+		txtName.textProperty().addListener(textFieldChangeListener);
+		txtStockLessThan.textProperty().addListener(textFieldChangeListener);
 
 		tableViewProductsStocks.setOnMousePressed(new TableViewMousePressedHandler());
 		
@@ -96,6 +136,10 @@ public class AllProductsController implements Initializable{
 		});
 	}
 
+	private void refrechColumnsPlusDetailsViews(){
+		columnQntSelled.setVisible(showPlusDetailsInTableView);
+		columnTotalGain.setVisible(showPlusDetailsInTableView);
+	}
 
 	public void refrechTableViewData(){
 
@@ -142,8 +186,35 @@ public class AllProductsController implements Initializable{
 			if (event.getSource() == btnSearch || event.getSource() == txtCode 
 					|| event.getSource() == txtName || event.getSource() == txtStockLessThan) {
 				refrechTableViewData();
+			}else if (event.getSource() == checkBoxShowMoreDetails) {
+				showPlusDetailsInTableView = checkBoxShowMoreDetails.isSelected();
+				refrechColumnsPlusDetailsViews();				
 			}
 		}
+	}
+	
+	private class TextFieldChangeListener implements ChangeListener<String> {
+
+		@Override
+		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+			TextField txt = (TextField) ((StringProperty)observable).getBean();
+			if (txt == txtCode) {
+				String ch = stringsManager.getOnlyLettersAndNumbers(txt.getText());
+				ch = ch.replace(" ", "");
+				ch = ch.toUpperCase();
+				txt.setText(ch);
+			}else if (txt == txtName) {
+				String ch = txt.getText();
+				ch = ch.replace("  ", " ");
+				txt.setText(ch);
+			}else if (txt == txtStockLessThan) {
+				String ch = stringsManager.getDoubleFormat(txt.getText());
+				ch = ch.replace("  ", " ");
+				txt.setText(ch);
+			}
+
+		}
+
 	}
 	
 	
@@ -157,7 +228,7 @@ public class AllProductsController implements Initializable{
 				
 				Product product = tableViewProductsStocks.getSelectionModel().getSelectedItem();
 				
-				RootViewController.selfRef.presentProductDetailsView(product);
+				RootViewController.selfRef.presentProductFullDetailsView(product);
 
 			}
 			

@@ -217,66 +217,66 @@ public class AppDataBaseManager {
 	public void createNewClient(Client client) throws SQLException{
 		PreparedStatement psInsertClinet = con.prepareStatement("INSERT INTO CLIENT (CODE, NAME, LASTNAME, ADRESSE) "
 				+ "VALUES (?, ?, ?, ?);");
-		
+
 		psInsertClinet.setString(1, client.getCode());
 		psInsertClinet.setString(2, client.getName());
 		psInsertClinet.setString(3, client.getLastName());
 		psInsertClinet.setString(4, client.getAddress());
-		
+
 		psInsertClinet.executeUpdate();
-		
+
 		PreparedStatement psInsertPhoneNumber = con.prepareStatement("INSERT INTO PHONENUMBER "
 				+ "(NUMBER, TYPE, CODE_CLIENT) VALUES (?, ?, ?);");
 		psInsertPhoneNumber.setString(3, client.getCode());
-		
+
 		psInsertPhoneNumber.setString(2, PHONE_TYPE_PHONE);
 		for (int i=0 ; i<client.getPhonesNumbers().size(); i++) {
 			psInsertPhoneNumber.setString(1, client.getPhonesNumbers().get(i));
 			psInsertPhoneNumber.executeUpdate();
 		}
-		
+
 		psInsertPhoneNumber.setString(2, PHONE_TYPE_FAX);
 		for (int i=0 ; i<client.getFaxNumbers().size(); i++) {
 			psInsertPhoneNumber.setString(1, client.getFaxNumbers().get(i));
 			psInsertPhoneNumber.executeUpdate();
 		}
-		
+
 	}
-	
+
 	public void updateClientCode(String clientCode, Client client) throws SQLException{
 		PreparedStatement psUpdateClinet = con.prepareStatement("UPDATE CLIENT "
 				+ "SET CODE = ?, NAME = ?, LASTNAME = ?, ADRESSE = ? "
 				+ "WHERE CODE = ?;");
-		
+
 		psUpdateClinet.setString(1, client.getCode());
 		psUpdateClinet.setString(2, client.getName());
 		psUpdateClinet.setString(3, client.getLastName());
 		psUpdateClinet.setString(4, client.getAddress());
 		psUpdateClinet.setString(5, clientCode);
-		
+
 		psUpdateClinet.executeUpdate();
-		
-		
+
+
 		st.executeUpdate("DELETE FROM PHONENUMBER WHERE CODE_CLIENT = '"+client.getCode()+"';");
-		
+
 		PreparedStatement psInsertPhoneNumber = con.prepareStatement("INSERT INTO PHONENUMBER "
 				+ "(NUMBER, TYPE, CODE_CLIENT) VALUES (?, ?, ?);");
 		psInsertPhoneNumber.setString(3, client.getCode());
-		
+
 		psInsertPhoneNumber.setString(2, PHONE_TYPE_PHONE);
 		for (int i=0 ; i<client.getPhonesNumbers().size(); i++) {
 			psInsertPhoneNumber.setString(1, client.getPhonesNumbers().get(i));
 			psInsertPhoneNumber.executeUpdate();
 		}
-		
+
 		psInsertPhoneNumber.setString(2, PHONE_TYPE_FAX);
 		for (int i=0 ; i<client.getFaxNumbers().size(); i++) {
 			psInsertPhoneNumber.setString(1, client.getFaxNumbers().get(i));
 			psInsertPhoneNumber.executeUpdate();
 		}
-		
+
 	}
-	
+
 	public boolean isClientCodeExist(String code) throws SQLException{
 		PreparedStatement pst = con.prepareStatement("SELECT CODE FROM CLIENT where CODE = ? ;");
 		pst.setString(1, code);
@@ -325,40 +325,40 @@ public class AppDataBaseManager {
 		return client;
 	}
 
-	
+
 	public ArrayList<String> getClientsPhonesNumbersByClientCode(String clientCode) throws SQLException{
 		ArrayList<String> phonesNumbers = new ArrayList<>();
-		
+
 		PreparedStatement ps = con.prepareStatement("SELECT NUMBER FROM PHONENUMBER "
 				+ "WHERE TYPE = ? and CODE_CLIENT = ? ;");
-		
+
 		ps.setString(1, PHONE_TYPE_PHONE);
 		ps.setString(2, clientCode);
-		
+
 		ResultSet rs = ps.executeQuery();
-		
+
 		while (rs.next()) {
 			phonesNumbers.add(rs.getString(1));
 		}
-		
+
 		return phonesNumbers;
 	}
-	
+
 	public ArrayList<String> getClientsFaxNumbersByClientCode(String clientCode) throws SQLException{
 		ArrayList<String> faxNumbers = new ArrayList<>();
-		
+
 		PreparedStatement ps = con.prepareStatement("SELECT NUMBER FROM PHONENUMBER "
 				+ "WHERE TYPE = ? and CODE_CLIENT = ? ;");
-		
+
 		ps.setString(1, PHONE_TYPE_FAX);
 		ps.setString(2, clientCode);
-		
+
 		ResultSet rs = ps.executeQuery();
-		
+
 		while (rs.next()) {
 			faxNumbers.add(rs.getString(1));
 		}
-		
+
 		return faxNumbers;
 	}
 
@@ -551,13 +551,13 @@ public class AppDataBaseManager {
 		rs.next();
 		return rs.getDouble(1);
 	}
-	
-	
+
+
 	public double getClientAllBillsTotalsByClientCode(String clientCode) throws SQLException{
 		double allBillsTotals = 0;
-		
+
 		ArrayList<String> allBillsCode = getAllBillsCodesByClientCode(clientCode);
-		
+
 		for (int i=0; i<allBillsCode.size(); i++) {
 			Bill bill = getBillByCode(allBillsCode.get(i));
 			allBillsTotals += bill.calculatTotalWithDiscount();
@@ -568,9 +568,9 @@ public class AppDataBaseManager {
 
 	public double getClientAllBillsGainedAmmountsByClientCode(String clientCode) throws SQLException{
 		double totalGained = 0;
-		
+
 		ArrayList<String> allBillsCode = getAllBillsCodesByClientCode(clientCode);
-		
+
 		for (int i=0; i<allBillsCode.size(); i++) {
 			Bill bill = getBillByCode(allBillsCode.get(i));
 			totalGained += bill.calculateGainedAmount();
@@ -581,9 +581,9 @@ public class AppDataBaseManager {
 
 	public double getClientAllBillsNotPayedAmmountsByClientCode(String clientCode) throws SQLException{
 		double totalNotPayed = 0;
-		
+
 		ArrayList<String> allBillsCode = getAllBillsCodesByClientCode(clientCode);
-		
+
 		for (int i=0; i<allBillsCode.size(); i++) {
 			Bill bill = getBillByCode(allBillsCode.get(i));
 			totalNotPayed += bill.calculateAmountNotPayed();
@@ -669,6 +669,41 @@ public class AppDataBaseManager {
 		return product;
 	}
 
+	public double getProductTotalQntSelledByProductCode(String productCode) throws SQLException{
+		ResultSet rs = st.executeQuery("SELECT SUM(QNT) FROM BILLPRODUCTS WHERE CODE_PRODUCT = '"
+				+productCode+"' ;");
+		rs.next();
+		double totalQnt = rs.getDouble(1);
+		return totalQnt;
+	}
+
+	public double getProductTotalGainedAmmountsByProductCode(String productCode) throws SQLException{
+		double totalGained = 0;
+
+		ResultSet rsProductSelledList = st.executeQuery("SELECT CODE_BILL, QNT, PRICE FROM BILLPRODUCTS WHERE CODE_PRODUCT = '"
+				+productCode+"' ;");
+
+		while (rsProductSelledList.next()) {
+			String billCode = rsProductSelledList.getString(1);
+			double productQntInBill = rsProductSelledList.getDouble(2);
+			double productSelledPriceInBill = rsProductSelledList.getDouble(3);
+			
+			ResultSet rsBillDetails = st.executeQuery("SELECT DATE, DISCOUNT FROM BILL WHERE CODE = '"
+					+billCode+"' ;");
+			rsBillDetails.next();
+			
+			Timestamp billDate = rsBillDetails.getTimestamp(1);
+			double billDiscount = rsBillDetails.getDouble(2);
+			ProductPrice price = getProductPrice(productCode, billDate);
+
+			productSelledPriceInBill = productSelledPriceInBill - (productSelledPriceInBill*(billDiscount/100));
+			
+			totalGained += (productSelledPriceInBill - price.getPrixAchatTTC())*productQntInBill;
+		}
+
+		return totalGained;
+	}
+
 	//Price
 
 
@@ -702,7 +737,6 @@ public class AppDataBaseManager {
 
 
 	public ProductPrice getProductPrice (String productCode,Timestamp timestamp) throws SQLException{
-
 		ProductPrice productPrice = null;
 
 		PreparedStatement pst = con.prepareStatement("SELECT "
@@ -721,8 +755,32 @@ public class AppDataBaseManager {
 
 		if (rs.next()) {
 			productPrice = new ProductPrice(rs.getDouble(1), rs.getDouble(2), rs.getDouble(3), rs.getDouble(4));
+		}else{
+			productPrice = getProductFirstPrice(productCode);
 		}
-		
+
+		return productPrice;
+	}
+
+	public ProductPrice getProductFirstPrice (String productCode) throws SQLException{
+
+		ProductPrice productPrice = null;
+
+		PreparedStatement pst = con.prepareStatement("SELECT PRIXACHATTTC, TVA, PRIXVENTEHT, PRIXVENTETTC "
+				+ "FROM PRICE p "
+				+ "WHERE (CODE_PRODUCT = ?) "
+				+ "and (DATE_START = "
+				+ "( SELECT min(DATE_START) from PRICE p1 Where p.CODE_PRODUCT = p1.CODE_PRODUCT ) "
+				+ ") ;");
+
+		pst.setString(1, productCode);
+
+		ResultSet rs = pst.executeQuery();
+
+		if (rs.next()) {
+			productPrice = new ProductPrice(rs.getDouble(1), rs.getDouble(2), rs.getDouble(3), rs.getDouble(4));
+		}
+
 		return productPrice;
 	}
 

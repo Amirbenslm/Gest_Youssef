@@ -1,6 +1,7 @@
 package views;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -17,7 +18,9 @@ import javafx.scene.control.ListView.EditEvent;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
+import managers.AppDataBaseManager;
 import managers.StringsManager;
+import models.Client;
 import models.ui.AlertError;
 
 public class ClientDetailsController implements Initializable{
@@ -59,7 +62,39 @@ public class ClientDetailsController implements Initializable{
 		faxNumbersData.add(STRING_TAP_TO_ADD_NEW_CLIENT);
 
 	}
+	
+	public Client setClientDetails(String clientCode){
+		Client client = null;
+		
+		try {
+			client = AppDataBaseManager.shared.getClientByCode(clientCode);
+			
+			client.setPhonesNumbers(AppDataBaseManager.shared.getClientsPhonesNumbersByClientCode(clientCode));
+			client.setFaxNumbers(AppDataBaseManager.shared.getClientsFaxNumbersByClientCode(clientCode));
+			
+			txtCode.setText(client.getCode());
+			txtName.setText(client.getName());
+			txtLastName.setText(client.getLastName());
+			txtAdress.setText(client.getAddress());
 
+			phonesNumbersData.setAll(client.getPhonesNumbers());
+			faxNumbersData.setAll(client.getFaxNumbers());
+		} catch (SQLException e) {
+			AlertError alert = new AlertError("ERROR ERR0027", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();
+		}
+		
+		return client;
+	}
+
+	public void changeEditsStats(boolean enabled){
+		txtCode.setEditable(enabled);
+		txtName.setEditable(enabled);
+		txtLastName.setEditable(enabled);
+		txtAdress.setEditable(enabled);
+		listViewPhones.setEditable(enabled);
+		listViewFaxes.setEditable(enabled);
+	}
 
 	public ArrayList<String> getPhonesNumbers(){
 		ArrayList<String> phonesNumbers = new ArrayList<>();

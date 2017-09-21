@@ -129,7 +129,7 @@ public class ClientSearchController implements Initializable{
 					&& tableViewClients.getSelectionModel().getSelectedItem() != null) {
 				Client client = tableViewClients.getSelectionModel().getSelectedItem();
 				
-				RootViewController.selfRef.presentClientFullDetailsView(client.getCode());
+				RootViewController.selfRef.presentClientDetailsView(client.getCode());
 			}
 
 		}
