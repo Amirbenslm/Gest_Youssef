@@ -932,6 +932,16 @@ public class AppDataBaseManager {
 		rs.next();
 		initStockForDepot(rs.getInt(1));
 	}
+	
+	public void updateDepotDetails(int depotCode, String name, String comments) throws SQLException{
+		PreparedStatement pst = con.prepareStatement("UPDATE DEPOT SET NAME = ?, COMMENTS = ? "
+				+ "WHERE CODE = ?;");
+		pst.setString(1, name);
+		pst.setString(2, comments);
+		pst.setInt(3, depotCode);
+
+		pst.executeUpdate();
+	}
 
 	public Depot getDepotByCode(int depotCode) throws SQLException{
 		Depot depot = null;

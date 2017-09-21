@@ -24,6 +24,7 @@ import models.StockTransfer;
 import models.ui.AddPaymentDelegate;
 import models.ui.ClientDetailsChangedDelegate;
 import models.ui.ClientSearchPickedClientDelegate;
+import models.ui.DepotDetailsChangedDelegate;
 import models.ui.ProductDetailsChangedDelegate;
 import models.ui.ProductSearchPickedProductDelegate;
 
@@ -445,6 +446,21 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/AddEditDepotDetails.fxml"));
 			Pane p = loader.load();
 
+			showPaneInAlertMode("", p, 500, 300);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void showEditDepotView(Depot depot, DepotDetailsChangedDelegate delegate){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditDepotDetails.fxml"));
+			Pane p = loader.load();
+			AddEditDepotDetailsController controller = loader.getController();
+			controller.forceSetEditModeForDepot(depot);
+			controller.delegate = delegate;
 			showPaneInAlertMode("", p, 500, 300);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -17,28 +17,36 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import managers.AppDataBaseManager;
+import models.Depot;
 import models.ui.AlertError;
+import models.ui.AlertSucces;
 import models.ui.AlertWarning;
+import models.ui.DepotDetailsChangedDelegate;
 
 public class AddEditDepotDetailsController implements Initializable {
 
-	@FXML Button btnSave;
+	@FXML Button btnAdd;
 	@FXML Button btnCancel;
 
 	@FXML FlowPane containerFP;
 
-	Pane paneDepotDetails;
-	DepotDetailsController depotDetailsController;
+	public DepotDetailsChangedDelegate delegate;
+	
+	private Pane paneDepotDetails;
+	private DepotDetailsController depotDetailsController;
+	
+	private boolean editMode = false;
+	private Depot currentEditingDepot = null;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
 
 		loadDepoDetailsView();
-		updateBtnSaveView();
+		updateBtnAddView();
 
 		ButtonActionEventHandler buttonActionEventHandler = new ButtonActionEventHandler();
-		btnSave.setOnAction(buttonActionEventHandler);
+		btnAdd.setOnAction(buttonActionEventHandler);
 		btnCancel.setOnAction(buttonActionEventHandler);
 		
 		depotDetailsController.txtName.textProperty().addListener(new TextFieldChangeListener());
@@ -57,16 +65,26 @@ public class AddEditDepotDetailsController implements Initializable {
 		}
 	}
 
+	public void forceSetEditModeForDepot(Depot depot){
+		editMode = true;
+		currentEditingDepot = depot;
+		
+		depotDetailsController.txtName.setText(depot.getName());
+		depotDetailsController.txtObservations.setText(depot.getComments());
+		
+		btnAdd.setText("Sauvegarder");
+		updateBtnAddView();
+	}
 	
 	private void clearTxtNameFromSpaces(){
 		depotDetailsController.txtName.setText(depotDetailsController.txtName.getText().replaceAll(" ", ""));
 	}
 
-	private void updateBtnSaveView(){
+	private void updateBtnAddView(){
 		if (depotDetailsController.txtName.getText().equals("")) {
-			btnSave.setDisable(true);
+			btnAdd.setDisable(true);
 		}else{
-			btnSave.setDisable(false);
+			btnAdd.setDisable(false);
 		}
 	}
 	
@@ -74,33 +92,67 @@ public class AddEditDepotDetailsController implements Initializable {
 		((Stage) containerFP.getScene().getWindow()).close();
 	}
 	
+	private void createTheDepot(){
+		String name = depotDetailsController.txtName.getText();
+		String comments = depotDetailsController.txtObservations.getText();
+
+		try {
+			
+			if (AppDataBaseManager.shared.isDepotNameExist(name)) {
+				AlertWarning alert = new AlertWarning("Nom existe déjà", 
+						"Le nom du dépôt ' "+name+" ' existe déjà !", 
+						"Réessayer avec un autre nom");
+				alert.showAndWait();
+			}else{
+				AppDataBaseManager.shared.addNewDepot(name, comments);
+				closeStage();
+				AlertSucces alert = new AlertSucces("Dépôt ajouté avec succès", 
+						"Dépôt ajouté avec succès", 
+						"Le dépôt "+name+" a été ajouté avec succés.");
+				alert.showAndWait();
+			}
+		} catch (SQLException e) {
+			AlertError alert = new AlertError("ERROR ERR0001", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();
+		}
+	}
+	
+	
+	private void updateTheDepot(){
+		String name = depotDetailsController.txtName.getText();
+		String comments = depotDetailsController.txtObservations.getText();
+
+		try {
+			if (!currentEditingDepot.getName().equals(name) 
+					&& AppDataBaseManager.shared.isDepotNameExist(name)) {
+				AlertWarning alert = new AlertWarning("Nom existe déjà", 
+						"Le nom du dépôt ' "+name+" ' existe déjà !", 
+						"Réessayer avec un autre nom");
+				alert.showAndWait();
+			}else{
+				AppDataBaseManager.shared.updateDepotDetails(currentEditingDepot.getCode(), name, comments);
+				delegate.depotDetailsChanged(currentEditingDepot.getCode());
+				closeStage();
+				AlertSucces alert = new AlertSucces("Dépôt modifiée avec succès", 
+						"Dépôt modifiée avec succès", 
+						"Les informations de la dépôt ont été modifiée avec succés.");
+				alert.showAndWait();
+			}
+		} catch (SQLException e) {
+			AlertError alert = new AlertError("ERROR ERR0046", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();
+		}
+	}
 	
 	private class ButtonActionEventHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			if (event.getSource() == btnSave) {
-				
-
-				String name = depotDetailsController.txtName.getText();
-				String comments = depotDetailsController.txtObservations.getText();
-
-				try {
-					
-					if (AppDataBaseManager.shared.isDepotNameExist(name)) {
-						AlertWarning alert = new AlertWarning("Nom existe déjà", 
-								"Le nom du dépôt ' "+name+" ' existe déjà !", 
-								"Réessayer avec un autre nom");
-						alert.showAndWait();
-					}else{
-						AppDataBaseManager.shared.addNewDepot(name, comments);
-						
-						closeStage();
-					}
-				} catch (SQLException e) {
-					AlertError alert = new AlertError("ERROR ERR0001", "SQL error code : "+e.getErrorCode(),e.getMessage());
-					alert.showAndWait();
+			if (event.getSource() == btnAdd) {
+				if (editMode){
+					updateTheDepot();
+				}else{
+					createTheDepot();	
 				}
-				
 			}
 			else if (event.getSource() == btnCancel) {
 				closeStage();
@@ -114,7 +166,7 @@ public class AddEditDepotDetailsController implements Initializable {
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 			clearTxtNameFromSpaces();
-			updateBtnSaveView();
+			updateBtnAddView();
 		}
 	}
 }

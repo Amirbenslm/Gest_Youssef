@@ -22,13 +22,15 @@ import managers.AppDataBaseManager;
 import managers.StringsManager;
 import models.Depot;
 import models.ui.AlertError;
+import models.ui.DepotDetailsChangedDelegate;
 
-public class AllDepotsController implements Initializable{
+public class AllDepotsController implements Initializable, DepotDetailsChangedDelegate{
 
 
 	@FXML Button btnNumberOfBills;
 	@FXML Button btnNumberOfProducts;
 	@FXML Button btnNumberOfStockTransfer;
+	@FXML Button btnModify;
 
 	@FXML TextArea txtObservations;
 
@@ -54,6 +56,7 @@ public class AllDepotsController implements Initializable{
 		btnNumberOfBills.setOnAction(actionEventHandler);
 		btnNumberOfProducts.setOnAction(actionEventHandler);
 		btnNumberOfStockTransfer.setOnAction(actionEventHandler);
+		btnModify.setOnAction(actionEventHandler);
 
 		try {
 			listViewDepots.getItems().setAll(AppDataBaseManager.shared.getAllDepots());
@@ -192,10 +195,29 @@ public class AllDepotsController implements Initializable{
 				if (Integer.parseInt(stringManager.getOnlyNumbers(btnNumberOfStockTransfer.getText())) > 0) {
 					presentAllStockTransfersView();
 				}
+			}else if (event.getSource() == btnModify && currentShowenDepot != null) {
+				RootViewController.selfRef.showEditDepotView(currentShowenDepot, AllDepotsController.this);
 			}
 		}
 	}
 
-
+	@Override
+	public void depotDetailsChanged(int depotCode) {
+		if (currentShowenDepot.getCode() == depotCode) {
+			try {
+				Depot depot = AppDataBaseManager.shared.getDepotByCode(depotCode);
+				lblDepotName.setText(depot.getName());
+				txtObservations.setText(depot.getComments());
+				
+				currentShowenDepot.setName(depot.getName());
+				currentShowenDepot.setComments(depot.getComments());
+				
+				listViewDepots.refresh();
+			} catch (SQLException e) {
+				AlertError alert = new AlertError("ERROR ERR0047", "Fatal Error", e.getMessage());
+				alert.showAndWait();
+			}
+		}
+	}
 
 }
