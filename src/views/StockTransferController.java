@@ -165,14 +165,25 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	private void transferTheProducts(){
 		
 		if (comboBoxFromDepot.getValue() == null) {
+			AlertError alert = new AlertError("Choisissez depuis quelle dépôt", null, 
+					"Vous devez choisissez depuis quelle dépôt !");
+			alert.showAndWait();
+			comboBoxFromDepot.requestFocus();
 			return;
 		}
 
 		if (comboBoxToDepot.getValue() == null) {
+			AlertError alert = new AlertError("Choisissez vers quelle dépôt", null, 
+					"Vous devez choisissez vers quelle dépôt !");
+			alert.showAndWait();
+			comboBoxToDepot.requestFocus();
 			return;
 		}
 
 		if (productsStockData.size() < 1){
+			AlertError alert = new AlertError("Entrer au moins un article", null, "Vous devez entrer au moins un article !");
+			alert.showAndWait();
+			txtCode.requestFocus();
 			return;
 		}
 
@@ -190,7 +201,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		try {
 			AppDataBaseManager.shared.transferStock(comboBoxFromDepot.getValue().getCode(), 
 					comboBoxToDepot.getValue().getCode(), productsWithStocks, timestamp);
-			
+			closeStage();
 			if (fromAdminMode) {
 				AlertSucces alert = new AlertSucces("Entrées en stock effectué avec succès", null, "Entrées en stock effectué avec succès !");
 				alert.showAndWait();
@@ -198,8 +209,6 @@ public class StockTransferController implements Initializable, ProductSearchPick
 				AlertSucces alert = new AlertSucces("Transfert effectué avec succès", null, "Transfert effectué avec succès !");
 				alert.showAndWait();				
 			}
-
-			closeStage();
 		} catch (SQLException e) {
 			AlertError alert = new AlertError("ERROR ERR0006", "SQL error code : "+e.getErrorCode(),e.getMessage());
 			alert.showAndWait();			

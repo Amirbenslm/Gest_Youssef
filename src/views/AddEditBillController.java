@@ -335,7 +335,7 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 		}
 
 		if (productsData.size() == 0) {
-			AlertError alert = new AlertError("Entrer au moins une article", null, "Vous devez entrer au moins une article !");
+			AlertError alert = new AlertError("Entrer au moins un article", null, "Vous devez entrer au moins un article !");
 			alert.showAndWait();
 			txtProductCode.requestFocus();
 			return;
