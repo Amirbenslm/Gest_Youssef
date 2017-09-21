@@ -17,11 +17,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.util.Callback;
 import managers.AppDataBaseManager;
 import models.Product;
-import models.ProductPrice;
 import models.ProductStock;
 import models.ui.AlertError;
 
@@ -49,11 +51,14 @@ public class AllProductsInDepotController implements Initializable{
 		columnName.setCellValueFactory(new PropertyValueFactory<>("Name"));
 		columnStock.setCellValueFactory(new PropertyValueFactory<>("Qnt"));
 
+		tableViewProducts.setRowFactory(new TableViewRowFactory());
 
 		ActionEventHandler actionEventHandler = new ActionEventHandler();
 		btnPrint.setOnAction(actionEventHandler);
 
 		tableViewProducts.setItems(productsStockData);
+		
+		tableViewProducts.setOnMousePressed(new TableViewMousePressedHandler());
 
 		mainTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListenerTab());
 	}
@@ -115,6 +120,47 @@ public class AllProductsInDepotController implements Initializable{
 				int x;
 			}
 		}
+	}
+	
+	private class TableViewMousePressedHandler implements EventHandler<MouseEvent>{
+
+		@Override
+		public void handle(MouseEvent event) {
+
+			if (event.isSecondaryButtonDown()  
+					&& tableViewProducts.getSelectionModel().getSelectedItem() != null)  {
+
+				Product product = tableViewProducts.getSelectionModel().getSelectedItem();
+				RootViewController.selfRef.presentProductDetailsView(product);
+			}
+
+		}
+
+	}
+	
+	private class TableViewRowFactory implements Callback<TableView<ProductStock>, TableRow<ProductStock>> {
+
+		@Override
+		public TableRow<ProductStock> call(TableView<ProductStock> param) {
+			return new TableRow<ProductStock>() {
+				@Override
+				protected void updateItem(ProductStock item, boolean empty) {
+					super.updateItem(item, empty);
+					
+					if (item == null || mainTabPane.getSelectionModel().getSelectedItem() == tabMissingProducts) {
+						setStyle("");
+					}else {
+						if (item.getQnt() >= 0) {
+							setStyle("");
+						}else{
+							setStyle("-fx-background-color: red;");
+						}
+					}
+					
+				}
+			};
+		}
+		
 	}
 
 }

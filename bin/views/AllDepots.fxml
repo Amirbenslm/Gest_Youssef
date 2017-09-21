@@ -15,7 +15,7 @@
          <children>
             <FlowPane alignment="CENTER" hgap="100.0" prefHeight="113.0" prefWidth="442.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="350.0">
                <children>
-                  <Button fx:id="btnNumberOfProducts" maxHeight="70.0" maxWidth="100.0" minHeight="70.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="100.0" text="#######&#10;articles&#10;" textAlignment="CENTER" wrapText="true" />
+                  <Button fx:id="btnNumberOfProducts" maxHeight="70.0" maxWidth="100.0" minHeight="70.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="100.0" text="#######&#10;articles en stock&#10;" textAlignment="CENTER" wrapText="true" />
                   <Button fx:id="btnNumberOfBills" maxHeight="70.0" maxWidth="100.0" minHeight="70.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="100.0" text="#######&#10;factures&#10;" textAlignment="CENTER" wrapText="true" />
                   <Button fx:id="btnNumberOfStockTransfer" maxHeight="70.0" maxWidth="100.0" minHeight="70.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="100.0" text="#######&#10;transfert de stock&#10;" textAlignment="CENTER" wrapText="true" />
                </children>

@@ -20,6 +20,7 @@ import models.Bill;
 import models.Client;
 import models.Depot;
 import models.Product;
+import models.StockTransfer;
 import models.ui.AddPaymentDelegate;
 import models.ui.ClientDetailsChangedDelegate;
 import models.ui.ClientSearchPickedClientDelegate;
@@ -246,7 +247,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 				clientSearchController.forceSearch(forClientCode);
 			}
 			
-			showPaneInAlertMode("BLA", p, 1135, 500);
+			showPaneInAlertMode("", p, 1135, 500);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -262,7 +263,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/AddEditBill.fxml"));
 			Pane p = loader.load();
 
-			showPaneInAlertMode("BLA", p, 1400, 750);
+			showPaneInAlertMode("", p, 1400, 750);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -276,7 +277,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			Pane p = loader.load();
 			AddEditBillController controller = loader.getController();
 			controller.showBillDetails(bill);
-			showPaneInAlertMode("BLA", p, 1400, 750);
+			showPaneInAlertMode("", p, 1400, 750);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -313,7 +314,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			addPayementController.setupDetails(forBillCode, amountTotalToPay, amountPayed);
 			addPayementController.delegate = delegate;
 			
-			showPaneInAlertMode("BLA", p, 930, 340);
+			showPaneInAlertMode("", p, 930, 340);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -344,7 +345,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/AddEditProductDetails.fxml"));
 			Pane p = loader.load();
 
-			showPaneInAlertMode("BLA", p, 850, 400);
+			showPaneInAlertMode("", p, 850, 400);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -384,7 +385,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 				}
 			});//to remove focus from txtCode
 			
-			showPaneInAlertMode("BLA", p, 750, 300);
+			showPaneInAlertMode("", p, 750, 300);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -423,7 +424,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 				productSearchController.forceSearch(forProductCode, forProductName);
 			}
 			
-			showPaneInAlertMode("BLA", p, 850, 400);
+			showPaneInAlertMode("", p, 850, 400);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -444,7 +445,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/AddEditDepotDetails.fxml"));
 			Pane p = loader.load();
 
-			showPaneInAlertMode("BLABLA", p, 500, 300);
+			showPaneInAlertMode("", p, 500, 300);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -477,7 +478,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/StockTransfer.fxml"));
 			Pane p = loader.load();
 			( (StockTransferController) loader.getController() ).forceSetTransferFromAdminMode();
-			showPaneInAlertMode("BLABLA", p, 900, 730);
+			showPaneInAlertMode("", p, 900, 730);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -493,7 +494,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			loader.setLocation(getClass().getResource("/views/StockTransfer.fxml"));
 			Pane p = loader.load();
 
-			showPaneInAlertMode("BLABLA", p, 900, 730);
+			showPaneInAlertMode("", p, 900, 730);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -501,6 +502,20 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	}
 
+	public void presentStockTransferDetailsView(StockTransfer stockTransfer) {
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/StockTransfer.fxml"));
+			Pane p = loader.load();
+			StockTransferController stockTransferController = loader.getController();
+			stockTransferController.showStockTransferDetails(stockTransfer);
+			showPaneInAlertMode("", p, 900, 600);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
+	
 
 }

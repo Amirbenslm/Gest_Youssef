@@ -29,7 +29,7 @@
             <ComboBox fx:id="comboBoxFromDepot" layoutX="78.0" layoutY="200.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="80.0" />
             <Label layoutX="369.0" layoutY="216.0" text="Vers : " AnchorPane.rightAnchor="330.0" AnchorPane.topAnchor="85.0" />
             <ComboBox fx:id="comboBoxToDepot" layoutX="464.0" layoutY="211.0" prefHeight="27.0" prefWidth="300.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="80.0" />
-            <TableView fx:id="tableViewProductsStocksTransfert" editable="true" layoutX="42.0" layoutY="151.0" prefHeight="218.0" prefWidth="248.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="120.0">
+            <TableView fx:id="tableViewProductsStocksTransfert" editable="true" layoutX="42.0" layoutY="151.0" prefHeight="218.0" prefWidth="248.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="120.0">
               <columns>
                 <TableColumn fx:id="columnCode" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" text="Code" />
                 <TableColumn fx:id="columnName" minWidth="300.0" prefWidth="300.0" text="Article" />
@@ -39,7 +39,7 @@
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
             </TableView>
-            <FlowPane alignment="CENTER_LEFT" hgap="10.0" layoutX="55.0" layoutY="560.0" prefHeight="88.0" prefWidth="761.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="560.0">
+            <FlowPane fx:id="flowPaneAddProduct" alignment="CENTER_LEFT" hgap="10.0" layoutX="55.0" layoutY="560.0" prefHeight="88.0" prefWidth="761.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="560.0">
                <children>
                   <Label text="  Code article :" />
                   <TextField fx:id="txtCode" prefHeight="27.0" prefWidth="143.0" />

@@ -11,17 +11,17 @@
    <children>
       <TabPane fx:id="mainTabPane" layoutX="14.0" layoutY="14.0" prefHeight="40.0" prefWidth="957.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
-          <Tab fx:id="tabAvailableProducts" text="Produits en stock">
+          <Tab fx:id="tabAvailableProducts" text="Articles en stock">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="467.0" prefWidth="807.0" />
             </content>
           </Tab>
-          <Tab fx:id="tabOutOfStockProducts" text="Produits hors stock">
+          <Tab fx:id="tabOutOfStockProducts" text="Articles hors stock">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>
           </Tab>
-            <Tab fx:id="tabMissingProducts" text="Produits manquant">
+            <Tab fx:id="tabMissingProducts" text="Articles manquant">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
               </content>

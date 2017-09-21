@@ -20,6 +20,7 @@ import models.Product;
 import models.ProductBill;
 import models.ProductPrice;
 import models.ProductStock;
+import models.StockTransfer;
 
 public class AppDataBaseManager {
 
@@ -462,8 +463,8 @@ public class AppDataBaseManager {
 	//if don't want to search with constraint pass "" not null and for date pass null
 	public ArrayList<String> getAllBillsCodes(String billCodeLike, LocalDate date, String clientCodeLike,
 			Integer depotCode) throws SQLException{
-		
-		
+
+
 		ArrayList<String> allBillsCodes = new ArrayList<>();
 
 		String sql = "SELECT CODE FROM BILL "
@@ -472,13 +473,13 @@ public class AppDataBaseManager {
 				+ "(? = false) or "
 				+ "((? = true) and (CAST(DATE AS DATE) = ?)) "
 				+ ")";
-		
+
 		if (depotCode != null) {
 			sql += "and CODE_DEPOT = "+depotCode+" ";
 		}
-		
+
 		sql += ";";
-		
+
 		PreparedStatement pst = con.prepareStatement(sql);
 
 		pst.setString(1, billCodeLike+"%");
@@ -491,7 +492,7 @@ public class AppDataBaseManager {
 		}else{
 			pst.setDate(5, new Date(System.currentTimeMillis()));// Will not execute, only to avoid SQLException -> Checked with  (date != null = true in the SQL request)
 		}
-		
+
 		ResultSet rs = pst.executeQuery();
 
 		while (rs.next()) {
@@ -512,8 +513,8 @@ public class AppDataBaseManager {
 		}
 		return allBillsCodes;
 	}
-	
-	
+
+
 	public ArrayList<String> getAllBillsCodesByDepotCode(int depotCode) throws SQLException{
 		ArrayList<String> allBillsCodes = new ArrayList<>();
 
@@ -523,7 +524,7 @@ public class AppDataBaseManager {
 		}
 		return allBillsCodes;
 	}
-	
+
 	public int getBillsCountForDepotCode(int depotCode) throws SQLException{
 		int billsCount = 0;
 
@@ -532,7 +533,7 @@ public class AppDataBaseManager {
 		if (rs.next()) {
 			billsCount = rs.getInt(1);
 		}
-		
+
 		return billsCount;
 	}
 
@@ -637,48 +638,48 @@ public class AppDataBaseManager {
 
 		return totalNotPayed;
 	}
-	
+
 	//Products
 
 	public ArrayList<String> getAllOutOfStockProductsCodesByDepotCode(int depotCode) throws SQLException{
 		ArrayList<String> allProductsCodes = new ArrayList<>();
-		
+
 		ResultSet rs = st.executeQuery("SELECT DISTINCT(CODE_PRODUCT) FROM STOCK "
 				+ "WHERE CODE_DEPOT = "+depotCode+" and QNT <= 0 ;");
-		
+
 		while (rs.next()) {
 			allProductsCodes.add(rs.getString(1));
 		}
-		
+
 		return allProductsCodes;
 	}
-	
+
 	public ArrayList<String> getAllAvailableProductsCodesByDepotCode(int depotCode) throws SQLException{
 		ArrayList<String> allProductsCodes = new ArrayList<>();
-		
+
 		ResultSet rs = st.executeQuery("SELECT DISTINCT(CODE_PRODUCT) FROM STOCK "
 				+ "WHERE CODE_DEPOT = "+depotCode+" and QNT > 0 ;");
-		
+
 		while (rs.next()) {
 			allProductsCodes.add(rs.getString(1));
 		}
-		
+
 		return allProductsCodes;
 	}
-	
+
 	public ArrayList<String> getAllMissingProductsCodesByDepotCode(int depotCode) throws SQLException{
 		ArrayList<String> allProductsCodes = new ArrayList<>();
-		
+
 		ResultSet rs = st.executeQuery("SELECT DISTINCT(CODE_PRODUCT) FROM STOCK "
 				+ "WHERE CODE_DEPOT = "+depotCode+" and QNT < 0 ;");
-		
+
 		while (rs.next()) {
 			allProductsCodes.add(rs.getString(1));
 		}
-		
+
 		return allProductsCodes;
 	}
-	
+
 
 	//if don't want to search with constraint pass "" not null and for stockMax pass null
 	public ArrayList<String> getAllProductsCodes(String codeLike, String nameLike, Double stockMax) throws SQLException{
@@ -740,26 +741,26 @@ public class AppDataBaseManager {
 		addPriceForProduct(product.getCode(), product.getPrice());
 		initStockforProduct(product.getCode());
 	}
-	
+
 	public void updateProductDetailsByProductCode(String productCode, Product product) throws SQLException{
-		
+
 		PreparedStatement pstUpdateProductDetails = con.prepareStatement("UPDATE PRODUCT "
 				+ "SET CODE = ?, NAME = ? "
 				+ "WHERE CODE = ?;");
-		
+
 		pstUpdateProductDetails.setString(1, product.getCode());
 		pstUpdateProductDetails.setString(2, product.getName());
 		pstUpdateProductDetails.setString(3, productCode);
-		
+
 		pstUpdateProductDetails.executeUpdate();
 
 		ProductPrice newPrice = product.getPrice();
 		ProductPrice oldPrice = getProductPrice(product.getCode());
-		
+
 		if (!newPrice.equals(oldPrice)) {
 			addPriceForProduct(product.getCode(), newPrice);
 		}
-		
+
 	}
 
 
@@ -793,23 +794,23 @@ public class AppDataBaseManager {
 			String billCode = rsProductSelledList.getString(1);
 			double productQntInBill = rsProductSelledList.getDouble(2);
 			double productSelledPriceInBill = rsProductSelledList.getDouble(3);
-			
+
 			ResultSet rsBillDetails = st.executeQuery("SELECT DATE, DISCOUNT FROM BILL WHERE CODE = '"
 					+billCode+"' ;");
 			rsBillDetails.next();
-			
+
 			Timestamp billDate = rsBillDetails.getTimestamp(1);
 			double billDiscount = rsBillDetails.getDouble(2);
 			ProductPrice price = getProductPrice(productCode, billDate);
 
 			productSelledPriceInBill = productSelledPriceInBill - (productSelledPriceInBill*(billDiscount/100));
-			
+
 			totalGained += (productSelledPriceInBill - price.getPrixAchatTTC())*productQntInBill;
 		}
 
 		return totalGained;
 	}
-	
+
 
 	//Price
 
@@ -959,20 +960,20 @@ public class AppDataBaseManager {
 
 	public double getDepotTotalGainedAmmountsByDepotCode(int depotCode) throws SQLException{
 		double totalGainedAmount = 0;
-		
+
 
 		ArrayList<String> allBillsCode = getAllBillsCodesByDepotCode(depotCode);
-		
+
 		for (int i=0; i<allBillsCode.size(); i++) {
 			Bill bill = getBillByCode(allBillsCode.get(i));
 			totalGainedAmount += bill.calculateGainedAmount();
 		}
-		
+
 		return totalGainedAmount;
 
 	}
 
-	
+
 	//Stocks
 
 
@@ -1071,6 +1072,32 @@ public class AppDataBaseManager {
 		transferStock(fromDepotCode, toDepotCode, productsWithStocks, new Timestamp(System.currentTimeMillis()));
 	}
 
+	public ArrayList<StockTransfer> getAllStockTransferForDepotByDepotCode(int depotCode) throws SQLException{
+		ArrayList<StockTransfer> stockTransferList = new ArrayList<>();
+
+		ResultSet rsGetTransferStockInformation = st.executeQuery("SELECT CODE, DATE, TODEPOT, FROMDEPOT "
+				+ "FROM TRANSFERSTOCK WHERE TODEPOT = "+depotCode+" or FROMDEPOT = "+depotCode+" ;");
+
+		PreparedStatement psGetTransferStockProductsList = con.prepareStatement("SELECT CODE_PRODUCT, QNT "
+				+ "FROM TRANSFERSTOCKPRODUCTS WHERE CODE_TRANSFERSTOCK = ? ;");
+
+		while (rsGetTransferStockInformation.next()) {
+			psGetTransferStockProductsList.setInt(1, rsGetTransferStockInformation.getInt(1));
+			ResultSet rsProducts = psGetTransferStockProductsList.executeQuery();
+			ArrayList<ProductStock> products = new ArrayList<>();
+
+			while (rsProducts.next()) {
+				products.add(new ProductStock(getProductByCode(rsProducts.getString(1)), 
+						rsProducts.getDouble(2)));
+			}
+
+			stockTransferList.add(new StockTransfer(rsGetTransferStockInformation.getTimestamp(2), 
+					rsGetTransferStockInformation.getInt(4), rsGetTransferStockInformation.getInt(3), 
+					products));
+		}
+
+		return stockTransferList;
+	}
 
 	public Double getProductsStock(String productCode) throws SQLException{
 
@@ -1097,28 +1124,28 @@ public class AppDataBaseManager {
 
 	public int getTransferCountForDepotCode(int depotCode) throws SQLException{
 		int transferCount = 0;
-		
+
 		ResultSet rs = st.executeQuery("SELECT COUNT(CODE) FROM TRANSFERSTOCK "
 				+ "WHERE TODEPOT = "+depotCode+" or FROMDEPOT = "+depotCode+" ;");
 
 		if (rs.next()) {
 			transferCount = rs.getInt(1);
 		}
-		
+
 		return transferCount;
 	}
-	
+
 	public int getProductsCountForDepotCode(int depotCode) throws SQLException{
 		int productCount = 0;
-		
+
 		ResultSet rs = st.executeQuery("SELECT COUNT(DISTINCT(CODE_PRODUCT)) FROM STOCK "
 				+ "WHERE CODE_DEPOT = "+depotCode+" AND QNT > 0 ;");
 
 		if (rs.next()) {
 			productCount = rs.getInt(1);
 		}
-		
+
 		return productCount;
 	}
-	
+
 }

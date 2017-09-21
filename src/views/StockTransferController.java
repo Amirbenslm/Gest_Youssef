@@ -33,6 +33,8 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import managers.AppDataBaseManager;
@@ -40,6 +42,7 @@ import managers.StringsManager;
 import models.Depot;
 import models.Product;
 import models.ProductStock;
+import models.StockTransfer;
 import models.ui.AlertError;
 import models.ui.AlertSucces;
 import models.ui.StringConverterLocalDate;
@@ -73,8 +76,11 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	@FXML TableColumn<ProductStock, String> columnName;
 	@FXML TableColumn<ProductStock, Double> columnQNT;
 
+	@FXML FlowPane flowPaneAddProduct;
+
 	private StringsManager stringsManager = new StringsManager();
 	private boolean fromAdminMode = false;
+	private boolean onlyShowDetailMode = false;
 
 	private ArrayList<Depot> allDepots;
 	private ObservableList<Depot> toDepotsList = FXCollections.observableArrayList();
@@ -104,7 +110,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		tableViewProductsStocksTransfert.setOnMousePressed(new TableViewMousePressedHandler());
 
 		tableViewProductsStocksTransfert.setItems(productsStockData);
-		
+
 		tableViewProductsStocksTransfert.setRowFactory(new TableViewRowFactory());
 
 		ActionEventHandler actionEventHandler = new ActionEventHandler();
@@ -133,10 +139,10 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		}
 	}
 
-	
+
 	public void forceSetTransferFromAdminMode(){
 		fromAdminMode = true;
-		
+
 		comboBoxFromDepot.setVisible(false);
 		lblFromDepot.setVisible(false);
 
@@ -162,8 +168,54 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	}
 
 
+	public void showStockTransferDetails(StockTransfer stockTransfer){
+		onlyShowDetailMode = true;
+		disableViewEditing();
+
+		date.setValue(stockTransfer.getDate().toLocalDateTime().toLocalDate());
+		spinerHoures.getValueFactory().setValue(stockTransfer.getDate().toLocalDateTime().getHour());
+		spinerMinutes.getValueFactory().setValue(stockTransfer.getDate().toLocalDateTime().getMinute());
+
+		try {
+			Depot fromDepot = AppDataBaseManager.shared.getDepotByCode(stockTransfer.getFromDepotCode());
+			Depot toDepot = AppDataBaseManager.shared.getDepotByCode(stockTransfer.getToDepotCode());
+			comboBoxFromDepot.setValue(fromDepot);
+			comboBoxToDepot.setValue(toDepot);
+			
+			productsStockData.clear();
+			productsStockData.addAll(stockTransfer.getProducts());
+		} catch (SQLException e) {
+			AlertError alert = new AlertError("ERROR ERR0045", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();
+		}
+
+	}
+
+	private void disableViewEditing(){
+		tableViewProductsStocksTransfert.setEditable(false);
+
+		date.setDisable(true);
+		spinerHoures.setDisable(true);
+		spinerMinutes.setDisable(true);
+		comboBoxFromDepot.setDisable(true);
+		comboBoxToDepot.setDisable(true);
+
+		date.setStyle("-fx-opacity: 1 ;");
+		spinerHoures.setStyle("-fx-opacity: 1 ;");
+		spinerMinutes.setStyle("-fx-opacity: 1 ;");
+		comboBoxFromDepot.setStyle("-fx-opacity: 1 ;");
+		comboBoxToDepot.setStyle("-fx-opacity: 1 ;");
+
+
+		btnTransfere.setVisible(false);
+		btnCancel.setVisible(false);
+		flowPaneAddProduct.setVisible(false);
+
+		AnchorPane.setBottomAnchor(tableViewProductsStocksTransfert, 0.0);
+	}
+
 	private void transferTheProducts(){
-		
+
 		if (comboBoxFromDepot.getValue() == null) {
 			AlertError alert = new AlertError("Choisissez depuis quelle dépôt", null, 
 					"Vous devez choisissez depuis quelle dépôt !");
@@ -245,7 +297,7 @@ public class StockTransferController implements Initializable, ProductSearchPick
 
 
 			}else if (event.getSource() == txtQnt || event.getSource() == btnAddProduct) {
-				
+
 				try {
 					Product product = AppDataBaseManager.shared.getProductByCode(txtCode.getText());
 
@@ -356,18 +408,18 @@ public class StockTransferController implements Initializable, ProductSearchPick
 	private class DepotChangeListener implements ChangeListener<Depot> {
 
 		private ComboBox<Depot> comboBox;
-		
+
 		public DepotChangeListener(ComboBox<Depot> comboBox) {
 			this.comboBox = comboBox;
 		}
-		
+
 		@Override
 		public void changed(ObservableValue<? extends Depot> observable, Depot oldValue, Depot newValue) {
-			
+
 			if (comboBoxFromDepot == comboBox) {
 				tableViewProductsStocksTransfert.refresh();
 			}
-			
+
 			if (comboBoxFromDepot.getValue() == comboBoxToDepot.getValue()) {
 				Platform.runLater(new Runnable() {
 					@Override
@@ -380,8 +432,8 @@ public class StockTransferController implements Initializable, ProductSearchPick
 		}
 
 	}
-	
-	
+
+
 	private class TableViewRowFactory implements Callback<TableView<ProductStock>, TableRow<ProductStock>> {
 		@Override
 		public TableRow<ProductStock> call(TableView<ProductStock> param) {
@@ -389,28 +441,28 @@ public class StockTransferController implements Initializable, ProductSearchPick
 				@Override
 				protected void updateItem(ProductStock item, boolean empty) {
 					super.updateItem(item, empty);
-					
-					if (item == null || comboBoxFromDepot.getValue() == null || fromAdminMode) {
+
+					if (item == null || comboBoxFromDepot.getValue() == null || fromAdminMode || onlyShowDetailMode) {
 						setStyle("");
 					}else {
 						try {
 							double availableStock = AppDataBaseManager.shared.getProductsStock(item.getCode(), 
 									comboBoxFromDepot.getValue().getCode());
-							
+
 							if (availableStock >= item.getQnt()) {
 								setStyle("");
 							}else{
 								setStyle("-fx-background-color: red;");
 							}
-							
+
 						} catch (SQLException e) {
 							setStyle("");
 							AlertError alert = new AlertError("ERROR ERR0007", "SQL error code : "+e.getErrorCode(),e.getMessage());
 							alert.showAndWait();
 						}
-						
+
 					}
-			       
+
 				}
 			};
 		}

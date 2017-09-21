@@ -80,7 +80,7 @@ public class AllDepotsController implements Initializable{
 
 		try {
 			int productsCount = AppDataBaseManager.shared.getProductsCountForDepotCode(depot.getCode());
-			btnNumberOfProducts.setText(productsCount+"\n"+"articles");
+			btnNumberOfProducts.setText(productsCount+"\n"+"articles en stock");
 		} catch (SQLException e) {
 			AlertError alert = new AlertError("ERROR ERR0035", "SQL error code : "+e.getErrorCode(),e.getMessage());
 			alert.showAndWait();
@@ -156,7 +156,17 @@ public class AllDepotsController implements Initializable{
 	}
 	
 	private void presentAllStockTransfersView(){
-		int x;
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/StockTransferHistory.fxml"));
+			Pane allProductsPane = loader.load();
+			StockTransferHistoryController stockTransferHistoryController = loader.getController();
+			stockTransferHistoryController.setDepotCode(currentShowenDepot.getCode());
+			RootViewController.selfRef.showPaneInAlertMode("", allProductsPane, 600, 500);
+		} catch (IOException e) {
+			AlertError alert = new AlertError("ERROR ERR0042", "Fatal Error", e.getMessage());
+			alert.showAndWait();
+		}
 	}
 	
 	
@@ -177,9 +187,7 @@ public class AllDepotsController implements Initializable{
 					presentAllBillsView();
 				}
 			}else if (event.getSource() == btnNumberOfProducts) {
-				if (Integer.parseInt(stringManager.getOnlyNumbers(btnNumberOfProducts.getText())) > 0) {
 					presentAllProductsView();
-				}
 			}else if (event.getSource() == btnNumberOfStockTransfer) {
 				if (Integer.parseInt(stringManager.getOnlyNumbers(btnNumberOfStockTransfer.getText())) > 0) {
 					presentAllStockTransfersView();
