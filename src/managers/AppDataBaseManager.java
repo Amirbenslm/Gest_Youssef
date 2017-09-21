@@ -460,16 +460,26 @@ public class AppDataBaseManager {
 	}
 
 	//if don't want to search with constraint pass "" not null and for date pass null
-	public ArrayList<String> getAllBillsCodes(String billCodeLike, LocalDate date, String clientCodeLike) 
-			throws SQLException{
+	public ArrayList<String> getAllBillsCodes(String billCodeLike, LocalDate date, String clientCodeLike,
+			Integer depotCode) throws SQLException{
+		
+		
 		ArrayList<String> allBillsCodes = new ArrayList<>();
 
-		PreparedStatement pst = con.prepareStatement("SELECT CODE FROM BILL "
+		String sql = "SELECT CODE FROM BILL "
 				+ "WHERE Code like ? and CODE_CLIENT like ? and "
 				+ "( "
 				+ "(? = false) or "
 				+ "((? = true) and (CAST(DATE AS DATE) = ?)) "
-				+ ") ;");
+				+ ")";
+		
+		if (depotCode != null) {
+			sql += "and CODE_DEPOT = "+depotCode+" ";
+		}
+		
+		sql += ";";
+		
+		PreparedStatement pst = con.prepareStatement(sql);
 
 		pst.setString(1, billCodeLike+"%");
 		pst.setString(2, "%"+clientCodeLike+"%");
@@ -481,7 +491,7 @@ public class AppDataBaseManager {
 		}else{
 			pst.setDate(5, new Date(System.currentTimeMillis()));// Will not execute, only to avoid SQLException -> Checked with  (date != null = true in the SQL request)
 		}
-
+		
 		ResultSet rs = pst.executeQuery();
 
 		while (rs.next()) {
@@ -501,6 +511,29 @@ public class AppDataBaseManager {
 			allBillsCodes.add(rs.getString(1));
 		}
 		return allBillsCodes;
+	}
+	
+	
+	public ArrayList<String> getAllBillsCodesByDepotCode(int depotCode) throws SQLException{
+		ArrayList<String> allBillsCodes = new ArrayList<>();
+
+		ResultSet rs = st.executeQuery("SELECT CODE FROM BILL WHERE CODE_DEPOT = "+depotCode+";");
+		while (rs.next()) {
+			allBillsCodes.add(rs.getString(1));
+		}
+		return allBillsCodes;
+	}
+	
+	public int getBillsCountForDepotCode(int depotCode) throws SQLException{
+		int billsCount = 0;
+
+		ResultSet rs = st.executeQuery("SELECT COUNT(CODE) FROM BILL WHERE CODE_DEPOT = "+depotCode+";");
+
+		if (rs.next()) {
+			billsCount = rs.getInt(1);
+		}
+		
+		return billsCount;
 	}
 
 	//Payments
@@ -592,8 +625,60 @@ public class AppDataBaseManager {
 		return totalNotPayed;
 	}
 
+	public double getDepotAllBillsNotPayedAmmountsByDepotCode(int depotCode) throws SQLException{
+		double totalNotPayed = 0;
+
+		ArrayList<String> allBillsCode = getAllBillsCodesByDepotCode(depotCode);
+
+		for (int i=0; i<allBillsCode.size(); i++) {
+			Bill bill = getBillByCode(allBillsCode.get(i));
+			totalNotPayed += bill.calculateAmountNotPayed();
+		}
+
+		return totalNotPayed;
+	}
+	
 	//Products
 
+	public ArrayList<String> getAllOutOfStockProductsCodesByDepotCode(int depotCode) throws SQLException{
+		ArrayList<String> allProductsCodes = new ArrayList<>();
+		
+		ResultSet rs = st.executeQuery("SELECT DISTINCT(CODE_PRODUCT) FROM STOCK "
+				+ "WHERE CODE_DEPOT = "+depotCode+" and QNT <= 0 ;");
+		
+		while (rs.next()) {
+			allProductsCodes.add(rs.getString(1));
+		}
+		
+		return allProductsCodes;
+	}
+	
+	public ArrayList<String> getAllAvailableProductsCodesByDepotCode(int depotCode) throws SQLException{
+		ArrayList<String> allProductsCodes = new ArrayList<>();
+		
+		ResultSet rs = st.executeQuery("SELECT DISTINCT(CODE_PRODUCT) FROM STOCK "
+				+ "WHERE CODE_DEPOT = "+depotCode+" and QNT > 0 ;");
+		
+		while (rs.next()) {
+			allProductsCodes.add(rs.getString(1));
+		}
+		
+		return allProductsCodes;
+	}
+	
+	public ArrayList<String> getAllMissingProductsCodesByDepotCode(int depotCode) throws SQLException{
+		ArrayList<String> allProductsCodes = new ArrayList<>();
+		
+		ResultSet rs = st.executeQuery("SELECT DISTINCT(CODE_PRODUCT) FROM STOCK "
+				+ "WHERE CODE_DEPOT = "+depotCode+" and QNT < 0 ;");
+		
+		while (rs.next()) {
+			allProductsCodes.add(rs.getString(1));
+		}
+		
+		return allProductsCodes;
+	}
+	
 
 	//if don't want to search with constraint pass "" not null and for stockMax pass null
 	public ArrayList<String> getAllProductsCodes(String codeLike, String nameLike, Double stockMax) throws SQLException{
@@ -724,6 +809,7 @@ public class AppDataBaseManager {
 
 		return totalGained;
 	}
+	
 
 	//Price
 
@@ -871,10 +957,23 @@ public class AppDataBaseManager {
 		return allDepots;
 	}
 
+	public double getDepotTotalGainedAmmountsByDepotCode(int depotCode) throws SQLException{
+		double totalGainedAmount = 0;
+		
 
+		ArrayList<String> allBillsCode = getAllBillsCodesByDepotCode(depotCode);
+		
+		for (int i=0; i<allBillsCode.size(); i++) {
+			Bill bill = getBillByCode(allBillsCode.get(i));
+			totalGainedAmount += bill.calculateGainedAmount();
+		}
+		
+		return totalGainedAmount;
+
+	}
+
+	
 	//Stocks
-
-
 
 
 	private void initStockforProduct(String productCode) throws SQLException{
@@ -996,4 +1095,30 @@ public class AppDataBaseManager {
 		}
 	}
 
+	public int getTransferCountForDepotCode(int depotCode) throws SQLException{
+		int transferCount = 0;
+		
+		ResultSet rs = st.executeQuery("SELECT COUNT(CODE) FROM TRANSFERSTOCK "
+				+ "WHERE TODEPOT = "+depotCode+" or FROMDEPOT = "+depotCode+" ;");
+
+		if (rs.next()) {
+			transferCount = rs.getInt(1);
+		}
+		
+		return transferCount;
+	}
+	
+	public int getProductsCountForDepotCode(int depotCode) throws SQLException{
+		int productCount = 0;
+		
+		ResultSet rs = st.executeQuery("SELECT COUNT(DISTINCT(CODE_PRODUCT)) FROM STOCK "
+				+ "WHERE CODE_DEPOT = "+depotCode+" AND QNT > 0 ;");
+
+		if (rs.next()) {
+			productCount = rs.getInt(1);
+		}
+		
+		return productCount;
+	}
+	
 }

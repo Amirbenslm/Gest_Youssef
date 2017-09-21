@@ -43,6 +43,21 @@ public class FullProductDetailsController implements Initializable, ProductDetai
 
 
 	public void showProductDetails(Product product){
+		
+		try {
+			double totalQntSelled = AppDataBaseManager.shared
+					.getProductTotalQntSelledByProductCode(product.getCode());
+			lblTotalQntSelled.setText(Double.toString(totalQntSelled));
+			
+			double totalGained = AppDataBaseManager.shared
+					.getProductTotalGainedAmmountsByProductCode(product.getCode());
+			lblTotalGain.setText(Double.toString(totalGained));
+			
+		} catch (SQLException e) {
+			AlertError alert = new AlertError("ERROR ERR0041", "SQL error code : "+e.getErrorCode(),e.getMessage());
+			alert.showAndWait();
+		}
+		
 		this.product = product;
 		productDetailsController.loadProductDetails(product);
 	}

@@ -30,8 +30,6 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	static public RootViewController selfRef;
 
-	@FXML Button btnDashboard;
-
 	@FXML Button btnClients;
 	@FXML Button btnAddClient;
 	@FXML Button btnBills;
@@ -55,7 +53,6 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		btnDashboard.setOnAction(this);
 
 		btnClients.setOnAction(this);
 		btnAddClient.setOnAction(this);
@@ -103,11 +100,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	@Override
 	public void handle(ActionEvent event) {
 
-		if (event.getSource() == btnDashboard) {
-			System.out.println("hhh");
-		}
-
-		else if (event.getSource() == btnClients) {
+		if (event.getSource() == btnClients) {
 			showAllClientsView();
 		}
 

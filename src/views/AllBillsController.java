@@ -59,6 +59,7 @@ public class AllBillsController implements Initializable{
 	private StringsManager stringsManager = new StringsManager();
 	
 	private String showOnlyForClientCode = ""; // if == "" it will show for all clients
+	private Integer showOnlyForDepotCode = null;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -131,13 +132,17 @@ public class AllBillsController implements Initializable{
 		showOnlyForClientCode = clientCode;
 	}
 	
+	public void forceSearchToShowOnlyForDepotCode(int depotCode){
+		showOnlyForDepotCode = depotCode;
+	}
+	
 	public void refrechTableViewData(){
 
 		billsData.clear();
 
 		try {
 			ArrayList<String> billsCodes = AppDataBaseManager.shared.getAllBillsCodes(txtBillsNumber.getText(), 
-					datePicker.getValue(), showOnlyForClientCode);
+					datePicker.getValue(), showOnlyForClientCode, showOnlyForDepotCode);
 
 			for (int i=0;i<billsCodes.size();i++){
 				Bill bill = AppDataBaseManager.shared.getBillByCode(billsCodes.get(i));
