@@ -10,7 +10,7 @@
       <FlowPane alignment="CENTER" hgap="30.0" layoutX="17.0" layoutY="338.0" prefHeight="60.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
             <Button fx:id="btnCancel" mnemonicParsing="false" text="Annuler" />
-            <Button fx:id="btnSave" disable="true" mnemonicParsing="false" text="Sauvegarder" />
+            <Button fx:id="btnAdd" disable="true" mnemonicParsing="false" text="Ajouter" />
          </children>
       </FlowPane>
    </children>

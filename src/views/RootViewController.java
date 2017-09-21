@@ -23,6 +23,7 @@ import models.Product;
 import models.ui.AddPaymentDelegate;
 import models.ui.ClientDetailsChangedDelegate;
 import models.ui.ClientSearchPickedClientDelegate;
+import models.ui.ProductDetailsChangedDelegate;
 import models.ui.ProductSearchPickedProductDelegate;
 
 public class RootViewController implements Initializable, EventHandler<ActionEvent> {
@@ -358,7 +359,21 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 
 	}
 	
-
+	public void showEditProductView(Product product, ProductDetailsChangedDelegate delegate){
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("/views/AddEditProductDetails.fxml"));
+			Pane p = loader.load();
+			AddEditProductDetailsController controller = loader.getController();
+			controller.forceSetEditModeForProduct(product);
+			controller.delegate = delegate;
+			showPaneInAlertMode("Ajouter client", p, 850, 400);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void presentProductDetailsView(Product product){
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -386,21 +401,12 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 	public void presentProductFullDetailsView(Product product){
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("/views/ProductDetails.fxml"));
+			loader.setLocation(getClass().getResource("/views/FullProductDetails.fxml"));
 			Pane p = loader.load();
-			ProductDetailsController productDetailsController = loader.getController();
+			FullProductDetailsController controller = loader.getController();
 			
-			productDetailsController.loadProductDetails(product);
-			productDetailsController.changeEditsStats(false);
-			
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					p.requestFocus();
-				}
-			});//to remove focus from txtCode
-			
-			showPaneInAlertMode("BLA", p, 750, 300);
+			controller.showProductDetails(product);
+			showPaneInAlertMode("Article détails", p, 780, 400);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

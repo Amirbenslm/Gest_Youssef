@@ -73,7 +73,6 @@ public class ProductDetailsController implements Initializable{
 		try {
 			loadDepotsData();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			AlertError alert = new AlertError("ERROR ERR0002", "SQL error code : "+e.getErrorCode(),e.getMessage());
 			alert.showAndWait();
 		}

@@ -154,8 +154,8 @@ public class AddEditClientController implements Initializable{
 			}else{
 				Client client = new Client(clientCode, clientName, clientLastName, clientAdress, 
 						clientPhonesNumbers, clientFaxNumbers);
-				AppDataBaseManager.shared.updateClientCode(currentEditingClientCode, client);
-				delegate.didChangeClientDetails(clientCode);
+				AppDataBaseManager.shared.updateClientDetailsByClientCode(currentEditingClientCode, client);
+				delegate.didChangeClientDetails(currentEditingClientCode, clientCode);
 				closeStage();
 				AlertSucces alert = new AlertSucces("Client modifiée avec succès", 
 						"Client modifiée avec succès", 

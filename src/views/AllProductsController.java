@@ -19,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -111,6 +112,8 @@ public class AllProductsController implements Initializable{
 				}
 			}
 		});
+		
+		tableViewProductsStocks.setRowFactory(new TableViewRowFactory());
 
 		ActionEventHandler actionEventHandler = new ActionEventHandler();
 		btnSearch.setOnAction(actionEventHandler);
@@ -235,4 +238,32 @@ public class AllProductsController implements Initializable{
 		}
 		
 	}
+	
+	private class TableViewRowFactory implements Callback<TableView<ProductStock>, TableRow<ProductStock>> {
+
+		@Override
+		public TableRow<ProductStock> call(TableView<ProductStock> param) {
+			return new TableRow<ProductStock>() {
+				@Override
+				protected void updateItem(ProductStock item, boolean empty) {
+					super.updateItem(item, empty);
+					
+					if (item == null) {
+						setStyle("");
+					}else {
+						if (item.getQnt() > 0) {
+							setStyle("");
+						}else{
+							setStyle("-fx-background-color: red;");
+						}
+					}
+					
+				}
+			};
+		}
+		
+	}
+	
+
+
 }

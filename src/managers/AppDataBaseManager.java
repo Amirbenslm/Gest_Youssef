@@ -243,7 +243,7 @@ public class AppDataBaseManager {
 
 	}
 
-	public void updateClientCode(String clientCode, Client client) throws SQLException{
+	public void updateClientDetailsByClientCode(String clientCode, Client client) throws SQLException{
 		PreparedStatement psUpdateClinet = con.prepareStatement("UPDATE CLIENT "
 				+ "SET CODE = ?, NAME = ?, LASTNAME = ?, ADRESSE = ? "
 				+ "WHERE CODE = ?;");
@@ -654,6 +654,27 @@ public class AppDataBaseManager {
 
 		addPriceForProduct(product.getCode(), product.getPrice());
 		initStockforProduct(product.getCode());
+	}
+	
+	public void updateProductDetailsByProductCode(String productCode, Product product) throws SQLException{
+		
+		PreparedStatement pstUpdateProductDetails = con.prepareStatement("UPDATE PRODUCT "
+				+ "SET CODE = ?, NAME = ? "
+				+ "WHERE CODE = ?;");
+		
+		pstUpdateProductDetails.setString(1, product.getCode());
+		pstUpdateProductDetails.setString(2, product.getName());
+		pstUpdateProductDetails.setString(3, productCode);
+		
+		pstUpdateProductDetails.executeUpdate();
+
+		ProductPrice newPrice = product.getPrice();
+		ProductPrice oldPrice = getProductPrice(product.getCode());
+		
+		if (!newPrice.equals(oldPrice)) {
+			addPriceForProduct(product.getCode(), newPrice);
+		}
+		
 	}
 
 

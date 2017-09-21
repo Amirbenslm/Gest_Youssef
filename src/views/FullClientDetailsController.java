@@ -139,8 +139,8 @@ public class FullClientDetailsController implements Initializable, ClientDetails
 	}
 
 	@Override
-	public void didChangeClientDetails(String clientCode) {
-		loadClientInformations(clientCode);
+	public void didChangeClientDetails(String oldClientCode, String newClientCode) {
+		loadClientInformations(newClientCode);
 	}
 
 }

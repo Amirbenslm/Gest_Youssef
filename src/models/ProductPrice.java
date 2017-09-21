@@ -47,4 +47,18 @@ public class ProductPrice {
 		this.prixVenteTTC = prixVenteTTC;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ProductPrice) {
+			ProductPrice objPrice = (ProductPrice) obj;
+			return prixAchatTTC == objPrice.prixAchatTTC
+					&& tva == objPrice.tva
+					&& prixVenteHT == objPrice.prixVenteHT
+					&& prixVenteTTC == objPrice.prixVenteTTC
+					;
+		}else{
+			return super.equals(obj);
+		}
+	}
+
 }
