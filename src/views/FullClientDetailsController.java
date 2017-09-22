@@ -117,7 +117,7 @@ public class FullClientDetailsController implements Initializable, ClientDetails
 			loader.setLocation(getClass().getResource("/views/ClientDetails.fxml"));
 			Pane clientDetailsPane = loader.load();
 			clientDetailsController = loader.getController();
-			containerFPForClientDetails.getChildren().add(0, clientDetailsPane);
+			containerFPForClientDetails.getChildren().add(clientDetailsPane);
 
 			clientDetailsController.changeEditsStats(false);
 		} catch (IOException e) {

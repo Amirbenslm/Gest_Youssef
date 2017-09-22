@@ -214,7 +214,7 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			Pane p = loader.load();
 			FullClientDetailsController controller = loader.getController();
 			controller.showClientDetails(clientCode);
-			showPaneInAlertMode("Client détails", p, 730, 630);
+			showPaneInAlertMode("Client détails", p, 730, 550);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

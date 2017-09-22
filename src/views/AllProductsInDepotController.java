@@ -185,6 +185,11 @@ public class AllProductsInDepotController implements Initializable{
 
 
 	private void print(){
+		
+		if (productsStockData.size() == 0) {
+			return;
+		}
+		
 		String filePath = "TEMPS/INVENTAIRE.pdf";
 		
 		new File("TEMPS").mkdir();
@@ -206,6 +211,11 @@ public class AllProductsInDepotController implements Initializable{
 			Paragraph parTitle = new Paragraph("Inventaire",new Font(FontFamily.TIMES_ROMAN, 30));
 			parTitle.setAlignment(Paragraph.ALIGN_CENTER);
 			doc.add(parTitle);
+			
+			Paragraph parSubtTitle = new Paragraph(mainTabPane.getSelectionModel().getSelectedItem().getText(),
+					new Font(FontFamily.TIMES_ROMAN, 13));
+			parSubtTitle.setAlignment(Paragraph.ALIGN_CENTER);
+			doc.add(parSubtTitle);
 			
 			doc.add(new Paragraph("\n\n\n"));
 			
@@ -238,13 +248,13 @@ public class AllProductsInDepotController implements Initializable{
 			for (int i=0; i<productsStockData.size();i++) {
 				ProductStock product = productsStockData.get(i);
 				
-				PdfPCell cell1 = new PdfPCell(new Phrase(product.getCode()));
+				PdfPCell cell1 = new PdfPCell(new Phrase(" "+product.getCode()));
 				cell1.setMinimumHeight(20);
 				
-				PdfPCell cell2 = new PdfPCell(new Phrase(product.getName()));
+				PdfPCell cell2 = new PdfPCell(new Phrase(" "+product.getName()));
 				cell2.setMinimumHeight(20);
 				
-				PdfPCell cell3 = new PdfPCell(new Phrase(Double.toString(product.getQnt())));
+				PdfPCell cell3 = new PdfPCell(new Phrase(" "+Double.toString(product.getQnt())));
 				cell3.setMinimumHeight(20);
 				
 				pdfTable.addCell(cell1);
