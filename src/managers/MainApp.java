@@ -1,6 +1,7 @@
 package managers;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import exceptions.DataBaseDriverLoadFailedException;
 import javafx.application.Application;
@@ -45,6 +46,11 @@ public class MainApp extends Application {
 			
 			launch(args);
 		} catch (DataBaseDriverLoadFailedException e) {
+			System.exit(-1);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			System.exit(-1);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

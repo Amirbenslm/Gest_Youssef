@@ -279,6 +279,12 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			AddEditBillController controller = loader.getController();
 			controller.showBillDetails(bill);
 			showPaneInAlertMode("", p, 1400, 750);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					p.requestFocus();
+				}
+			});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -402,6 +408,12 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			
 			controller.showProductDetails(product);
 			showPaneInAlertMode("Article détails", p, 780, 400);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					p.requestFocus();
+				}
+			});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -526,6 +538,12 @@ public class RootViewController implements Initializable, EventHandler<ActionEve
 			StockTransferController stockTransferController = loader.getController();
 			stockTransferController.showStockTransferDetails(stockTransfer);
 			showPaneInAlertMode("", p, 900, 600);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					p.requestFocus();
+				}
+			});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

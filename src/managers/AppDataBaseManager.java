@@ -35,7 +35,7 @@ public class AppDataBaseManager {
 	private Connection con;
 	private Statement st;
 
-	public void prepare() throws DataBaseDriverLoadFailedException{
+	public void prepare() throws DataBaseDriverLoadFailedException,SQLException{
 		try {
 			Class.forName("org.hsqldb.jdbc.JDBCDriver");
 			con = DriverManager.getConnection("jdbc:hsqldb:file:Database/AppDB;shutdown=true;hsqldb.write_delay=false", "Xr@o/o!t#_?", "Y1T#6uNa?+O$c42@");
@@ -43,8 +43,6 @@ public class AppDataBaseManager {
 			createDatabaseTablesIfNeedeed();
 		} catch (ClassNotFoundException e) {
 			throw new DataBaseDriverLoadFailedException();
-		} catch (SQLException e) {
-			System.out.println("ha?");
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -162,10 +163,16 @@ public class AllDepotsController implements Initializable, DepotDetailsChangedDe
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("/views/StockTransferHistory.fxml"));
-			Pane allProductsPane = loader.load();
+			Pane stockTransferHistoryPane = loader.load();
 			StockTransferHistoryController stockTransferHistoryController = loader.getController();
 			stockTransferHistoryController.setDepotCode(currentShowenDepot.getCode());
-			RootViewController.selfRef.showPaneInAlertMode("", allProductsPane, 600, 500);
+			RootViewController.selfRef.showPaneInAlertMode("", stockTransferHistoryPane, 600, 500);
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					stockTransferHistoryPane.requestFocus();
+				}
+			});
 		} catch (IOException e) {
 			AlertError alert = new AlertError("ERROR ERR0042", "Fatal Error", e.getMessage());
 			alert.showAndWait();
