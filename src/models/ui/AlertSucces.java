@@ -2,8 +2,6 @@ package models.ui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 public class AlertSucces {
 
@@ -16,9 +14,9 @@ public class AlertSucces {
 		alert.setHeaderText(header);
 		alert.setContentText(content);
 		
-		Image image = new Image(getClass().getResource("../../views/icons/SuccesIcon.png").toExternalForm());
-		ImageView imageView = new ImageView(image);
-		alert.setGraphic(imageView);
+		//Image image = new Image(getClass().getResource("../../views/icons/SuccesIcon.png").toExternalForm());
+		//ImageView imageView = new ImageView(image);
+		//alert.setGraphic(imageView);
 	}
 	
 	public void show(){

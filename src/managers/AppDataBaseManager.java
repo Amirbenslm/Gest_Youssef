@@ -56,6 +56,11 @@ public class AppDataBaseManager {
 		}
 	}
 	 */
+	
+	public void closeAllConnections() throws SQLException{
+		st.close();
+		con.close();
+	}
 
 	private void createDatabaseTablesIfNeedeed(){
 
