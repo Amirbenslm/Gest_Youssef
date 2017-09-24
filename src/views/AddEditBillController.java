@@ -120,6 +120,12 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 	public void initialize(URL location, ResourceBundle resources) {
 
 		configureTimeView();
+		
+		date.valueProperty().addListener(new ChangeListenerLocalDate());
+		
+		ChangeListenerInteger changeListenerInteger = new ChangeListenerInteger();
+		spinerHoures.valueProperty().addListener(changeListenerInteger);
+		spinerMinutes.valueProperty().addListener(changeListenerInteger);
 
 		comboBoxDepot.setItems(depotsList);
 		
@@ -258,6 +264,8 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 			productsData.clear();
 			productsData.addAll(bill.getProducts());
 
+			txtDiscount.setText(Double.toString(bill.getDiscount()));
+			
 			refreshBillTotal();
 
 			// payementDetails
@@ -624,6 +632,42 @@ ProductSearchPickedProductDelegate, AddPaymentDelegate{
 
 	}
 
+	
+	private class ChangeListenerLocalDate implements ChangeListener<LocalDate>{
+		
+		@Override
+		public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue, LocalDate newValue) {
+			refrechProductsPrices();
+		}
+		
+	}
+	
+	private class ChangeListenerInteger implements ChangeListener<Integer>{
+
+		@Override
+		public void changed(ObservableValue<? extends Integer> observable, Integer oldValue, Integer newValue) {
+			refrechProductsPrices();
+		}
+		
+	}
+	
+	
+	private void refrechProductsPrices(){
+		LocalDateTime localDateTime = 
+				date.getValue().atTime(spinerHoures.getValue(), spinerMinutes.getValue());
+		Timestamp timestamp = Timestamp.valueOf(localDateTime);
+		
+		for (int i=0; i<productsData.size(); i++) {
+			try {
+				productsData.get(i).setPrice(AppDataBaseManager.shared.getProductPrice(productsData.get(i).getCode()
+						, timestamp));
+			} catch (SQLException e) {
+				AlertError alert = new AlertError("ERROR ERR0049", "SQL error code : "+e.getErrorCode(),e.getMessage());
+				alert.showAndWait();
+			}
+		}
+		tableViewProducts.refresh();
+	}
 
 	@Override
 	public void clientSearchPickedClient(Client client) {

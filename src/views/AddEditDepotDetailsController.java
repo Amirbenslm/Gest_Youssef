@@ -75,10 +75,6 @@ public class AddEditDepotDetailsController implements Initializable {
 		btnAdd.setText("Sauvegarder");
 		updateBtnAddView();
 	}
-	
-	private void clearTxtNameFromSpaces(){
-		depotDetailsController.txtName.setText(depotDetailsController.txtName.getText().replaceAll(" ", ""));
-	}
 
 	private void updateBtnAddView(){
 		if (depotDetailsController.txtName.getText().equals("")) {
@@ -165,7 +161,7 @@ public class AddEditDepotDetailsController implements Initializable {
 
 		@Override
 		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-			clearTxtNameFromSpaces();
+			depotDetailsController.txtName.setText(depotDetailsController.txtName.getText().replaceAll("  ", " "));
 			updateBtnAddView();
 		}
 	}

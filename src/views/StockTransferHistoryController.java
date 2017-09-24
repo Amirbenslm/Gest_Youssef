@@ -52,9 +52,9 @@ public class StockTransferHistoryController implements Initializable {
 			@Override
 			public ObservableValue<String> call(CellDataFeatures<StockTransfer, String> param) {
 				try {
-					int depotCode = 0;
+					int depotCode;
 					
-					if (param.getValue().getFromDepotCode() == depotCode) {
+					if (param.getValue().getFromDepotCode() == StockTransferHistoryController.this.depotCode) {
 						depotCode = param.getValue().getToDepotCode();
 					}else{
 						depotCode = param.getValue().getFromDepotCode();

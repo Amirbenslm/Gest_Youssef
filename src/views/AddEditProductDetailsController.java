@@ -127,6 +127,11 @@ public class AddEditProductDetailsController implements Initializable {
 				}
 
 				closeStage();
+				
+				AlertSucces alert = new AlertSucces("Article ajouté avec succès", 
+						"Article ajouté avec succès", 
+						"L'article ' "+productTitle+" ' a été ajouté avec succés.");
+				alert.showAndWait();
 			}
 		} catch (SQLException e) {
 			AlertError alert = new AlertError("ERROR ERR0004", "SQL error code : "+e.getErrorCode(),e.getMessage());
@@ -159,6 +164,28 @@ public class AddEditProductDetailsController implements Initializable {
 
 				AppDataBaseManager.shared.updateProductDetailsByProductCode(currentEditingProductCode, product);
 				
+				ArrayList<DepotStock> depotsStocks = productDetailsController.getDepotsStocksEntredByUser();
+
+				for (int i=0; i<depotsStocks.size();i++){
+					
+					double newQnt = depotsStocks.get(i).getQnt();
+					
+					double oldQnt = AppDataBaseManager.shared.getProductsStock(productCode, 
+							depotsStocks.get(i).getCode());
+					
+					if (newQnt > oldQnt) {
+						ProductStock productStock = new ProductStock(product, newQnt-oldQnt);
+						ArrayList<ProductStock> productStockInArrayList = new ArrayList<>();
+						productStockInArrayList.add(productStock);
+						AppDataBaseManager.shared.transferStock(0, depotsStocks.get(i).getCode(), productStockInArrayList);
+					} else if (newQnt < oldQnt){
+						ProductStock productStock = new ProductStock(product, oldQnt-newQnt);
+						ArrayList<ProductStock> productStockInArrayList = new ArrayList<>();
+						productStockInArrayList.add(productStock);
+						AppDataBaseManager.shared.transferStock(depotsStocks.get(i).getCode(), 0, productStockInArrayList);	
+					}
+				}
+				
 				delegate.didChangeProductDetails(currentEditingProductCode, productCode);
 				closeStage();
 				AlertSucces alert = new AlertSucces("Article modifiée avec succès", 
@@ -172,9 +199,7 @@ public class AddEditProductDetailsController implements Initializable {
 		}
 	}
 
-
-
-
+	
 	private class ButtonActionEventHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {

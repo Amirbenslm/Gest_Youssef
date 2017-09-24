@@ -95,16 +95,13 @@ public class ProductDetailsController implements Initializable{
 			txtPrixDeVentHT.setText(Double.toString(product.getPrice().getPrixVenteHT()));
 			txtPrixDeVentTTC.setText(Double.toString(product.getPrice().getPrixVenteTTC()));
 
-
 			for (int i=0; i<depotsData.size(); i++) {
-
-
 				double qnt = AppDataBaseManager.shared.getProductsStock(product.getCode(), 
 						depotsData.get(i).getCode());
 				depotsData.get(i).setQnt(qnt);
-
 			}
-
+			tableViewDepots.refresh();
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

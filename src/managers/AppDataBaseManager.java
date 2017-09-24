@@ -23,6 +23,8 @@ import models.ProductStock;
 import models.StockTransfer;
 
 public class AppDataBaseManager {
+	
+	static public int ADMIN_DEPOT_CODE = 0;
 
 	static private String PAYMENT_TYPE_CHECK = "CHECK";
 	static private String PAYMENT_TYPE_CASH = "CASH";
@@ -1063,15 +1065,16 @@ public class AppDataBaseManager {
 			pstInsertIntoTransferStockProducts.setDouble(3, productsWithStocks.get(i).getQnt());
 
 			pstInsertIntoTransferStockProducts.executeUpdate();
-
-			pstUpdateStock.setDouble(1, productsWithStocks.get(i).getQnt());
-			pstUpdateStock.setInt(2, toDepotCode);
+			
 			pstUpdateStock.setString(3, productsWithStocks.get(i).getCode());
 
-			pstUpdateStock.executeUpdate();
+			if (toDepotCode != ADMIN_DEPOT_CODE) {
+				pstUpdateStock.setDouble(1, productsWithStocks.get(i).getQnt());
+				pstUpdateStock.setInt(2, toDepotCode);
+				pstUpdateStock.executeUpdate();
+			}
 
-
-			if (fromDepotCode != 0) {
+			if (fromDepotCode != ADMIN_DEPOT_CODE) {
 				pstUpdateStock.setDouble(1, -productsWithStocks.get(i).getQnt());
 				pstUpdateStock.setInt(2, fromDepotCode);
 				pstUpdateStock.executeUpdate();

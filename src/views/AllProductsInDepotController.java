@@ -248,13 +248,13 @@ public class AllProductsInDepotController implements Initializable{
 			for (int i=0; i<productsStockData.size();i++) {
 				ProductStock product = productsStockData.get(i);
 				
-				PdfPCell cell1 = new PdfPCell(new Phrase(" "+product.getCode()));
+				PdfPCell cell1 = new PdfPCell(new Phrase(" "+product.getCode(), new Font(FontFamily.TIMES_ROMAN, 9)));
 				cell1.setMinimumHeight(20);
 				
-				PdfPCell cell2 = new PdfPCell(new Phrase(" "+product.getName()));
+				PdfPCell cell2 = new PdfPCell(new Phrase(" "+product.getName(), new Font(FontFamily.TIMES_ROMAN, 9)));
 				cell2.setMinimumHeight(20);
 				
-				PdfPCell cell3 = new PdfPCell(new Phrase(" "+Double.toString(product.getQnt())));
+				PdfPCell cell3 = new PdfPCell(new Phrase(" "+Double.toString(product.getQnt()), new Font(FontFamily.TIMES_ROMAN, 9)));
 				cell3.setMinimumHeight(20);
 				
 				pdfTable.addCell(cell1);

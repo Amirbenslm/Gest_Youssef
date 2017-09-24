@@ -110,9 +110,9 @@ public class MainApp extends Application {
 		grid.setPadding(new Insets(20, 150, 10, 10));
 
 		PasswordField txtPassword = new PasswordField();
-		txtPassword.setPromptText("  Password");
+		txtPassword.setPromptText("Password");
 
-		grid.add(new Label("Password:"), 0, 0);
+		grid.add(new Label("  Password:"), 0, 0);
 		grid.add(txtPassword, 1, 0);
 
 		dialog.getDialogPane().setContent(grid);
